@@ -9,7 +9,7 @@ import {
 import App from "./App.jsx";
 import Navbar from "./components/Navbar.jsx";
 
-import Civilisations from "./Pages/civilisations.jsx";
+import Civilisations from "./Pages/civilisattions/civilisations.jsx";
 import DieuxDeesses from "./Pages/dieux-deesses.jsx";
 import HerosCreatures from "./Pages/heros-creatures.jsx";
 import MythesLegendes from "./Pages/mythes-legendes.jsx";

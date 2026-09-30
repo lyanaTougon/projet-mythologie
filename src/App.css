@@ -1,5 +1,5 @@
 /* =========================================================
-   RESET GLOBAL
+   RESET
    ========================================================= */
 
 * {
@@ -7,6 +7,11 @@
   padding: 0;
   box-sizing: border-box;
 }
+
+
+/* =========================================================
+   HTML / BODY / ROOT
+   ========================================================= */
 
 html,
 body,
@@ -18,20 +23,26 @@ body,
 
 body {
   margin: 0;
+  padding: 0;
+
   font-family: Arial, sans-serif;
-  background-color: #0f0b18;
-  color: white;
+
+  background-color: #4a4a4a;
+  color: #ffffff;
+
+  overflow-x: hidden;
 }
 
 
 /* =========================================================
-   APP
+   APPLICATION
    ========================================================= */
 
 .app {
   width: 100%;
   min-height: 100vh;
-  background-color: #0f0b18;
+
+  background-color: #4a4a4a;
 }
 
 
@@ -40,6 +51,8 @@ body {
    ========================================================= */
 
 .navbar {
+  position: relative;
+
   width: 100%;
   height: 80px;
 
@@ -49,8 +62,11 @@ body {
 
   padding: 0 40px;
 
-  background-color: #181124;
-  border-bottom: 1px solid #302342;
+  background-color: #2f2f2f;
+
+  border-bottom: 1px solid #5a5a5a;
+
+  z-index: 1000;
 }
 
 
@@ -59,7 +75,8 @@ body {
    ========================================================= */
 
 .navbar-logo {
-  color: white;
+  color: #d4af37;
+
   text-decoration: none;
 
   font-size: 24px;
@@ -67,16 +84,20 @@ body {
 
   white-space: nowrap;
 
-  transition: color 0.2s ease;
+  transition:
+    color 0.2s ease,
+    transform 0.2s ease;
 }
 
 .navbar-logo:hover {
-  color: #c9a7ff;
+  color: #f0d878;
+
+  transform: scale(1.02);
 }
 
 
 /* =========================================================
-   MENU
+   MENU PRINCIPAL
    ========================================================= */
 
 .navbar-menu {
@@ -87,8 +108,14 @@ body {
   gap: 35px;
 }
 
+
+/* =========================================================
+   LIENS NAVBAR
+   ========================================================= */
+
 .navbar-link {
-  color: white;
+  color: #eeeeee;
+
   text-decoration: none;
 
   font-size: 16px;
@@ -100,39 +127,184 @@ body {
 }
 
 .navbar-link:hover {
-  color: #c9a7ff;
+  color: #d4af37;
 }
 
 
 /* =========================================================
-   CONNEXION
+   DROPDOWN CIVILISATIONS
    ========================================================= */
 
-.navbar-connexion {
-  color: white;
-  text-decoration: none;
+.navbar-dropdown {
+  position: relative;
+}
 
-  padding: 10px 18px;
 
-  border: 1px solid #c9a7ff;
+/* =========================================================
+   BOUTON CIVILISATIONS
+   ========================================================= */
+
+.navbar-dropdown-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 10px 0;
+
+  background: none;
+  border: none;
+
+  color: #eeeeee;
+
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 500;
+
+  cursor: pointer;
+
+  white-space: nowrap;
+
+  transition: color 0.2s ease;
+}
+
+.navbar-dropdown-button:hover {
+  color: #d4af37;
+}
+
+
+/* =========================================================
+   FLÈCHE
+   ========================================================= */
+
+.arrow {
+  color: #d4af37;
+
+  font-size: 10px;
+}
+
+
+/* =========================================================
+   MENU DÉROULANT
+   ========================================================= */
+
+.dropdown-menu {
+  position: absolute;
+
+  top: calc(100% + 8px);
+  left: 50%;
+
+  transform: translateX(-50%);
+
+  width: 260px;
+
+  display: flex;
+  flex-direction: column;
+
+  padding: 8px;
+
+  background-color: #222222;
+
+  border: 1px solid #6a6a6a;
+
   border-radius: 8px;
 
-  font-size: 15px;
-  white-space: nowrap;
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.7);
+
+  z-index: 2000;
+
+  opacity: 0;
+  visibility: hidden;
+
+  transition:
+    opacity 0.2s ease,
+    visibility 0.2s ease;
+}
+
+
+/* =========================================================
+   AFFICHAGE AU SURVOL
+   ========================================================= */
+
+.navbar-dropdown:hover .dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+}
+
+
+/* =========================================================
+   LIENS DU MENU DÉROULANT
+   ========================================================= */
+
+.dropdown-link {
+  display: flex;
+  align-items: center;
+
+  width: 100%;
+
+  padding: 13px 14px;
+
+  color: #dddddd;
+
+  text-decoration: none;
+
+  font-size: 14px;
+
+  border-radius: 5px;
 
   transition:
     background-color 0.2s ease,
     color 0.2s ease;
 }
 
-.navbar-connexion:hover {
-  background-color: #c9a7ff;
-  color: #181124;
+.dropdown-link:hover {
+  background-color: #3a3a3a;
+
+  color: #d4af37;
 }
 
 
 /* =========================================================
-   ACCUEIL
+   BOUTON CONNEXION
+   ========================================================= */
+
+.navbar-connexion {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 10px 18px;
+
+  color: #d4af37;
+
+  text-decoration: none;
+
+  font-size: 15px;
+  font-weight: 500;
+
+  white-space: nowrap;
+
+  border: 1px solid #d4af37;
+
+  border-radius: 6px;
+
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.navbar-connexion:hover {
+  background-color: #d4af37;
+
+  color: #222222;
+
+  border-color: #d4af37;
+}
+
+
+/* =========================================================
+   PAGE D'ACCUEIL
    ========================================================= */
 
 .home {
@@ -145,34 +317,179 @@ body {
   align-items: center;
   justify-content: center;
 
+  padding: 60px 40px;
+
   text-align: center;
 
-  padding: 60px 40px;
+  background-color: #4a4a4a;
 }
+
+
+/* =========================================================
+   TITRE ACCUEIL
+   ========================================================= */
 
 .home h1 {
   margin-bottom: 20px;
+
+  color: #d4af37;
 
   font-size: 52px;
   font-weight: bold;
 }
 
+
+/* =========================================================
+   TEXTE ACCUEIL
+   ========================================================= */
+
 .home p {
   width: 100%;
   max-width: 800px;
 
-  color: #cfc8d9;
+  color: #e0e0e0;
 
   font-size: 18px;
+
   line-height: 1.6;
 }
 
 
 /* =========================================================
-   RESPONSIVE
+   PAGES GÉNÉRALES
+   ========================================================= */
+
+.page {
+  width: 100%;
+  min-height: calc(100vh - 80px);
+
+  padding: 60px 40px;
+
+  background-color: #4a4a4a;
+}
+
+
+/* =========================================================
+   TITRES DES PAGES
+   ========================================================= */
+
+.page h1 {
+  margin-bottom: 20px;
+
+  color: #d4af37;
+
+  font-size: 42px;
+  font-weight: bold;
+}
+
+.page h2 {
+  margin-bottom: 15px;
+
+  color: #ffffff;
+
+  font-size: 30px;
+}
+
+.page p {
+  color: #dddddd;
+
+  font-size: 17px;
+
+  line-height: 1.7;
+}
+
+
+/* =========================================================
+   CARTES
+   ========================================================= */
+
+.cards {
+  width: 100%;
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(auto-fit, minmax(240px, 1fr));
+
+  gap: 25px;
+
+  margin-top: 40px;
+}
+
+
+/* =========================================================
+   CARTE
+   ========================================================= */
+
+.card {
+  padding: 25px;
+
+  background-color: #2b2b2b;
+
+  border: 1px solid #5b5b5b;
+
+  border-radius: 8px;
+
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+
+  background-color: #333333;
+
+  border-color: #d4af37;
+
+  box-shadow:
+    0 8px 25px rgba(212, 175, 55, 0.15);
+}
+
+
+/* =========================================================
+   TITRE CARTE
+   ========================================================= */
+
+.card h3 {
+  margin-bottom: 12px;
+
+  color: #d4af37;
+
+  font-size: 21px;
+}
+
+
+/* =========================================================
+   TEXTE CARTE
+   ========================================================= */
+
+.card p {
+  color: #d0d0d0;
+
+  font-size: 15px;
+
+  line-height: 1.6;
+}
+
+
+/* =========================================================
+   BOUTONS GÉNÉRAUX
+   ========================================================= */
+
+button {
+  font-family: inherit;
+}
+
+
+/* =========================================================
+   RESPONSIVE — TABLETTE
    ========================================================= */
 
 @media (max-width: 1100px) {
+
   .navbar {
     padding: 0 25px;
   }
@@ -181,17 +498,32 @@ body {
     gap: 20px;
   }
 
-  .navbar-link {
+  .navbar-link,
+  .navbar-dropdown-button {
     font-size: 14px;
+  }
+
+  .navbar-logo {
+    font-size: 21px;
+  }
+
+  .home h1 {
+    font-size: 46px;
   }
 }
 
 
+/* =========================================================
+   RESPONSIVE — PETIT ÉCRAN
+   ========================================================= */
+
 @media (max-width: 800px) {
+
   .navbar {
     height: auto;
 
     flex-direction: column;
+
     gap: 20px;
 
     padding: 20px;
@@ -201,6 +533,9 @@ body {
     width: 100%;
 
     flex-wrap: wrap;
+
+    justify-content: center;
+
     gap: 15px;
   }
 
@@ -208,19 +543,75 @@ body {
     margin-bottom: 5px;
   }
 
+  .dropdown-menu {
+    left: 0;
+
+    transform: none;
+  }
+
   .home {
     min-height: calc(100vh - 250px);
+
+    padding: 40px 20px;
   }
 
   .home h1 {
     font-size: 40px;
   }
+
+  .home p {
+    font-size: 17px;
+  }
+
+  .page {
+    padding: 40px 25px;
+  }
+
+  .page h1 {
+    font-size: 36px;
+  }
 }
 
 
+/* =========================================================
+   RESPONSIVE — MOBILE
+   ========================================================= */
+
 @media (max-width: 500px) {
+
+  .navbar {
+    padding: 18px 15px;
+  }
+
+  .navbar-logo {
+    font-size: 20px;
+  }
+
+  .navbar-menu {
+    flex-direction: column;
+
+    gap: 12px;
+  }
+
+  .navbar-link,
+  .navbar-dropdown-button {
+    font-size: 15px;
+  }
+
+  .dropdown-menu {
+    position: absolute;
+
+    top: calc(100% + 8px);
+
+    left: 50%;
+
+    width: 240px;
+
+    transform: translateX(-50%);
+  }
+
   .home {
-    padding: 40px 20px;
+    padding: 30px 20px;
   }
 
   .home h1 {
@@ -229,5 +620,25 @@ body {
 
   .home p {
     font-size: 16px;
+  }
+
+  .page {
+    padding: 30px 20px;
+  }
+
+  .page h1 {
+    font-size: 30px;
+  }
+
+  .page h2 {
+    font-size: 24px;
+  }
+
+  .cards {
+    grid-template-columns: 1fr;
+
+    gap: 18px;
+
+    margin-top: 30px;
   }
 }

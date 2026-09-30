@@ -4,31 +4,87 @@ function Navbar() {
   return (
     <nav className="navbar">
 
+      {/* LOGO */}
       <Link to="/" className="navbar-logo">
         🏛️ Mythologie
       </Link>
 
+      {/* MENU */}
       <div className="navbar-menu">
 
-        <Link to="/civilisations" className="navbar-link">
-          Civilisations
-        </Link>
+        {/* CIVILISATIONS */}
+        <div className="navbar-dropdown">
 
-        <Link to="/dieux-deesses" className="navbar-link">
+          <button className="navbar-dropdown-button">
+            Civilisations
+            <span className="arrow">▼</span>
+          </button>
+
+          <div className="dropdown-menu">
+
+            <Link
+              to="/civilisations/azteque"
+              className="dropdown-link"
+            >
+              🌞 Mythologie aztèque
+            </Link>
+
+            <Link
+              to="/civilisations/japonaise"
+              className="dropdown-link"
+            >
+              ⛩️ Mythologie japonaise
+            </Link>
+
+            <Link
+              to="/civilisations/nordique"
+              className="dropdown-link"
+            >
+              ⚔️ Mythologie nordique
+            </Link>
+
+            <Link
+              to="/civilisations/egyptienne"
+              className="dropdown-link"
+            >
+              🏺 Mythologie égyptienne
+            </Link>
+
+          </div>
+
+        </div>
+
+        {/* DIEUX & DÉESSES */}
+        <Link
+          to="/dieux-deesses"
+          className="navbar-link"
+        >
           Dieux & déesses
         </Link>
 
-        <Link to="/heros-creatures" className="navbar-link">
+        {/* HÉROS & CRÉATURES */}
+        <Link
+          to="/heros-creatures"
+          className="navbar-link"
+        >
           Héros & créatures
         </Link>
 
-        <Link to="/mythes-legendes" className="navbar-link">
+        {/* MYTHES & LÉGENDES */}
+        <Link
+          to="/mythes-legendes"
+          className="navbar-link"
+        >
           Mythes & légendes
         </Link>
 
       </div>
 
-      <Link to="/connexion" className="navbar-connexion">
+      {/* CONNEXION */}
+      <Link
+        to="/connexion"
+        className="navbar-connexion"
+      >
         Se connecter
       </Link>
 
