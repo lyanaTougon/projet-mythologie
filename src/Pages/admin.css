@@ -1,0 +1,484 @@
+/* ============================================================
+   PAGE ADMIN
+   ============================================================ */
+
+.admin-page {
+  min-height: calc(100vh - 80px);
+  padding: 40px;
+  box-sizing: border-box;
+  background: #4a4a4a;
+  color: white;
+}
+
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+
+.admin-header {
+  max-width: 1400px;
+  margin: 0 auto 30px;
+}
+
+.admin-small-title {
+  color: #d4af37;
+  font-size: 0.8rem;
+  font-weight: bold;
+  letter-spacing: 2px;
+  margin-bottom: 8px;
+}
+
+.admin-header h1 {
+  margin: 0;
+  font-size: 2.5rem;
+  color: #f0d878;
+}
+
+.admin-header p {
+  color: #d0d0d0;
+}
+
+
+/* ============================================================
+   MESSAGES
+   ============================================================ */
+
+.admin-message {
+  max-width: 1400px;
+  margin: 0 auto 20px;
+  padding: 15px 20px;
+  border-radius: 8px;
+  font-weight: bold;
+}
+
+.admin-message.success {
+  background: #214d32;
+  border: 1px solid #3fa45d;
+}
+
+.admin-message.error {
+  background: #5a2525;
+  border: 1px solid #d65a5a;
+}
+
+
+/* ============================================================
+   ONGLETS
+   ============================================================ */
+
+.admin-tabs {
+  max-width: 1400px;
+  margin: 0 auto 30px;
+
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.admin-tabs button {
+  padding: 13px 18px;
+
+  border: 1px solid #555;
+  border-radius: 8px;
+
+  background: #2b2b2b;
+  color: #ddd;
+
+  cursor: pointer;
+  font-size: 0.95rem;
+
+  transition: 0.2s;
+}
+
+.admin-tabs button:hover {
+  border-color: #d4af37;
+  color: #f0d878;
+}
+
+.admin-tabs button.active {
+  background: #d4af37;
+  border-color: #d4af37;
+  color: #222;
+  font-weight: bold;
+}
+
+
+/* ============================================================
+   SECTION
+   ============================================================ */
+
+.admin-section {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.admin-section h2 {
+  margin-bottom: 25px;
+  color: #f0d878;
+}
+
+
+/* ============================================================
+   STATISTIQUES
+   ============================================================ */
+
+.admin-stat-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, 1fr);
+
+  gap: 20px;
+}
+
+.admin-stat-card {
+  background: #2b2b2b;
+
+  border: 1px solid #555;
+  border-radius: 12px;
+
+  padding: 25px;
+
+  text-align: center;
+
+  transition: 0.2s;
+}
+
+.admin-stat-card:hover {
+  border-color: #d4af37;
+  transform: translateY(-3px);
+}
+
+.admin-stat-card span {
+  display: block;
+  font-size: 2rem;
+  margin-bottom: 10px;
+}
+
+.admin-stat-card strong {
+  display: block;
+
+  color: #d4af37;
+
+  font-size: 2rem;
+}
+
+.admin-stat-card p {
+  color: #ccc;
+}
+
+
+/* ============================================================
+   FORMULAIRE
+   ============================================================ */
+
+.admin-form {
+  max-width: 800px;
+
+  margin-bottom: 35px;
+
+  padding: 25px;
+
+  background: #2b2b2b;
+
+  border: 1px solid #555;
+  border-radius: 12px;
+
+  box-sizing: border-box;
+}
+
+.admin-form h3 {
+  margin-top: 0;
+  margin-bottom: 25px;
+
+  color: #f0d878;
+}
+
+.admin-form label {
+  display: block;
+
+  margin-top: 15px;
+  margin-bottom: 7px;
+
+  color: #ddd;
+  font-weight: bold;
+}
+
+.admin-form input,
+.admin-form textarea,
+.admin-form select {
+  width: 100%;
+
+  padding: 12px;
+
+  box-sizing: border-box;
+
+  border: 1px solid #555;
+  border-radius: 7px;
+
+  background: #222;
+  color: white;
+
+  font-size: 1rem;
+
+  outline: none;
+}
+
+.admin-form input:focus,
+.admin-form textarea:focus,
+.admin-form select:focus {
+  border-color: #d4af37;
+}
+
+.admin-form textarea {
+  resize: vertical;
+}
+
+.form-actions {
+  display: flex;
+
+  gap: 10px;
+
+  margin-top: 20px;
+}
+
+
+/* ============================================================
+   BOUTONS
+   ============================================================ */
+
+.save-button,
+.cancel-button,
+.edit-button,
+.delete-button {
+  border: none;
+
+  border-radius: 7px;
+
+  padding: 10px 15px;
+
+  cursor: pointer;
+
+  font-weight: bold;
+
+  transition: 0.2s;
+}
+
+.save-button {
+  background: #d4af37;
+  color: #222;
+}
+
+.save-button:hover {
+  background: #f0d878;
+}
+
+.cancel-button {
+  background: #555;
+  color: white;
+}
+
+.cancel-button:hover {
+  background: #666;
+}
+
+.edit-button {
+  background: #3d4f63;
+  color: white;
+}
+
+.edit-button:hover {
+  background: #536b85;
+}
+
+.delete-button {
+  background: #682f2f;
+  color: white;
+}
+
+.delete-button:hover {
+  background: #8b3d3d;
+}
+
+
+/* ============================================================
+   LISTE CONTENU
+   ============================================================ */
+
+.admin-content-list {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 15px;
+}
+
+.content-card {
+  display: flex;
+
+  justify-content: space-between;
+  align-items: center;
+
+  gap: 25px;
+
+  padding: 20px;
+
+  background: #2b2b2b;
+
+  border: 1px solid #555;
+  border-radius: 10px;
+
+  box-sizing: border-box;
+}
+
+.content-card:hover {
+  border-color: #777;
+}
+
+.content-card h3 {
+  margin: 5px 0 8px;
+
+  color: white;
+}
+
+.content-card p {
+  margin: 5px 0;
+
+  color: #ccc;
+}
+
+.content-id {
+  color: #888;
+
+  font-size: 0.8rem;
+}
+
+.content-civilisation {
+  color: #d4af37 !important;
+
+  font-weight: bold;
+}
+
+.content-type {
+  color: #f0d878 !important;
+
+  text-transform: capitalize;
+}
+
+.content-actions {
+  display: flex;
+
+  gap: 8px;
+
+  flex-shrink: 0;
+}
+
+
+/* ============================================================
+   TABLE UTILISATEURS
+   ============================================================ */
+
+.admin-table-wrapper {
+  overflow-x: auto;
+
+  background: #2b2b2b;
+
+  border: 1px solid #555;
+  border-radius: 10px;
+}
+
+.admin-table {
+  width: 100%;
+
+  border-collapse: collapse;
+}
+
+.admin-table th {
+  padding: 15px;
+
+  background: #222;
+
+  color: #f0d878;
+
+  text-align: left;
+}
+
+.admin-table td {
+  padding: 15px;
+
+  border-top: 1px solid #444;
+
+  color: #ddd;
+}
+
+.admin-table tr:hover td {
+  background: #303030;
+}
+
+.role-admin,
+.role-user {
+  display: inline-block;
+
+  padding: 5px 10px;
+
+  border-radius: 20px;
+
+  font-size: 0.8rem;
+
+  font-weight: bold;
+}
+
+.role-admin {
+  background: #5c4b1e;
+  color: #f0d878;
+}
+
+.role-user {
+  background: #3b3b3b;
+  color: #ccc;
+}
+
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 1000px) {
+
+  .admin-stat-grid {
+    grid-template-columns:
+      repeat(2, 1fr);
+  }
+
+}
+
+
+@media (max-width: 700px) {
+
+  .admin-page {
+    padding: 25px 15px;
+  }
+
+  .admin-header h1 {
+    font-size: 2rem;
+  }
+
+  .admin-stat-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .content-card {
+    flex-direction: column;
+
+    align-items: flex-start;
+  }
+
+  .content-actions {
+    width: 100%;
+  }
+
+  .content-actions button {
+    flex: 1;
+  }
+
+}

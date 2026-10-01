@@ -1,0 +1,191 @@
+/* ============================================================
+   PAGE CONNEXION
+   ============================================================ */
+
+.connexion-page {
+  min-height: calc(100vh - 80px);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  padding: 40px 20px;
+
+  box-sizing: border-box;
+
+  background: #4a4a4a;
+}
+
+
+/* ============================================================
+   CARTE
+   ============================================================ */
+
+.connexion-card {
+  width: 100%;
+  max-width: 450px;
+
+  padding: 35px;
+
+  box-sizing: border-box;
+
+  background: #2b2b2b;
+
+  border: 1px solid #555;
+  border-radius: 14px;
+
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.25);
+}
+
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+
+.connexion-header {
+  text-align: center;
+
+  margin-bottom: 30px;
+}
+
+.connexion-icon {
+  font-size: 3rem;
+
+  margin-bottom: 10px;
+}
+
+.connexion-header h1 {
+  margin: 0 0 10px;
+
+  color: #f0d878;
+
+  font-size: 2rem;
+}
+
+.connexion-header p {
+  margin: 0;
+
+  color: #ccc;
+}
+
+
+/* ============================================================
+   MESSAGES
+   ============================================================ */
+
+.connexion-message {
+  padding: 12px 15px;
+
+  margin-bottom: 20px;
+
+  border-radius: 7px;
+
+  text-align: center;
+
+  font-weight: bold;
+}
+
+.connexion-message.error {
+  background: #5a2525;
+
+  border: 1px solid #d65a5a;
+
+  color: #fff;
+}
+
+.connexion-message.success {
+  background: #214d32;
+
+  border: 1px solid #3fa45d;
+
+  color: #fff;
+}
+
+
+/* ============================================================
+   FORMULAIRE
+   ============================================================ */
+
+.connexion-form {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 8px;
+}
+
+.connexion-form label {
+  margin-top: 10px;
+
+  color: #ddd;
+
+  font-weight: bold;
+}
+
+.connexion-form input {
+  width: 100%;
+
+  padding: 13px;
+
+  box-sizing: border-box;
+
+  background: #222;
+
+  border: 1px solid #555;
+
+  border-radius: 7px;
+
+  color: white;
+
+  font-size: 1rem;
+
+  outline: none;
+}
+
+.connexion-form input:focus {
+  border-color: #d4af37;
+}
+
+.connexion-form input::placeholder {
+  color: #888;
+}
+
+
+/* ============================================================
+   BOUTON
+   ============================================================ */
+
+.connexion-button {
+  width: 100%;
+
+  margin-top: 20px;
+
+  padding: 14px;
+
+  border: none;
+
+  border-radius: 7px;
+
+  background: #d4af37;
+
+  color: #222;
+
+  font-size: 1rem;
+
+  font-weight: bold;
+
+  cursor: pointer;
+
+  transition: 0.2s;
+}
+
+.connexion-button:hover {
+  background: #f0d878;
+}
+
+.connexion-button:disabled {
+  opacity: 0.6;
+
+  cursor: not-allowed;
+}
