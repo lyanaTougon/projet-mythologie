@@ -1,4 +1,5 @@
 const express = require("express");
+const router = express.Router();
 
 const pool = require("../db");
 
@@ -7,30 +8,80 @@ const {
   requireAdmin,
 } = require("../middleware/auth");
 
-const router = express.Router();
 
-
-/* ============================================================
-   GET - TOUS LES MYTHES
-   ============================================================ */
+// ============================================================
+// GET — TOUS LES MYTHES
+// ============================================================
 
 router.get("/", async (req, res) => {
   try {
-    const result = await pool.query(`
+    const {
+      civilisation,
+      search,
+    } = req.query;
+
+    let query = `
       SELECT
         mythes.id,
         mythes.titre,
         mythes.description,
         mythes.image,
+        mythes.civilisation_id,
         mythes.created_at,
-        civilisations.id AS civilisation_id,
-        civilisations.nom AS civilisation,
+        civilisations.nom AS civilisation_nom,
         civilisations.slug AS civilisation_slug
+
       FROM mythes
+
       INNER JOIN civilisations
-        ON mythes.civilisation_id = civilisations.id
+        ON mythes.civilisation_id =
+           civilisations.id
+    `;
+
+    const conditions = [];
+    const values = [];
+
+    // ----------------------------------------------------------
+    // CIVILISATION
+    // ----------------------------------------------------------
+
+    if (civilisation) {
+      values.push(civilisation);
+
+      conditions.push(
+        `civilisations.slug = $${values.length}`
+      );
+    }
+
+    // ----------------------------------------------------------
+    // RECHERCHE
+    // ----------------------------------------------------------
+
+    if (search) {
+      values.push(`%${search}%`);
+
+      conditions.push(`
+        (
+          mythes.titre ILIKE $${values.length}
+          OR mythes.description ILIKE $${values.length}
+        )
+      `);
+    }
+
+    if (conditions.length > 0) {
+      query += `
+        WHERE ${conditions.join(" AND ")}
+      `;
+    }
+
+    query += `
       ORDER BY mythes.id ASC
-    `);
+    `;
+
+    const result = await pool.query(
+      query,
+      values
+    );
 
     res.json({
       mythes: result.rows,
@@ -38,7 +89,7 @@ router.get("/", async (req, res) => {
 
   } catch (error) {
     console.error(
-      "Erreur récupération mythes :",
+      "❌ Erreur récupération mythes :",
       error
     );
 
@@ -49,63 +100,70 @@ router.get("/", async (req, res) => {
 });
 
 
-/* ============================================================
-   GET - MYTHES D'UNE CIVILISATION
-   ============================================================ */
+// ============================================================
+// GET — UN MYTHE
+// ============================================================
 
-router.get(
-  "/civilisation/:slug",
-  async (req, res) => {
-    try {
-      const { slug } = req.params;
+router.get("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
 
-      const result = await pool.query(
-        `
-        SELECT
-          mythes.id,
-          mythes.titre,
-          mythes.description,
-          mythes.image,
-          mythes.created_at,
-          civilisations.id AS civilisation_id,
-          civilisations.nom AS civilisation,
-          civilisations.slug AS civilisation_slug
-        FROM mythes
-        INNER JOIN civilisations
-          ON mythes.civilisation_id = civilisations.id
-        WHERE civilisations.slug = $1
-        ORDER BY mythes.id ASC
-        `,
-        [slug]
-      );
+    const result = await pool.query(
+      `
+      SELECT
+        mythes.id,
+        mythes.titre,
+        mythes.description,
+        mythes.image,
+        mythes.civilisation_id,
+        mythes.created_at,
+        civilisations.nom AS civilisation_nom,
+        civilisations.slug AS civilisation_slug
 
-      res.json({
-        mythes: result.rows,
-      });
+      FROM mythes
 
-    } catch (error) {
-      console.error(
-        "Erreur récupération mythes :",
-        error
-      );
+      INNER JOIN civilisations
+        ON mythes.civilisation_id =
+           civilisations.id
 
-      res.status(500).json({
-        message: "Erreur serveur.",
+      WHERE mythes.id = $1
+      `,
+      [id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        message: "Mythe introuvable.",
       });
     }
+
+    res.json({
+      mythe: result.rows[0],
+    });
+
+  } catch (error) {
+    console.error(
+      "❌ Erreur récupération mythe :",
+      error
+    );
+
+    res.status(500).json({
+      message: "Erreur serveur.",
+    });
   }
-);
+});
 
 
-/* ============================================================
-   POST - AJOUTER UN MYTHE
-   ============================================================ */
+// ============================================================
+// POST
+// ============================================================
 
 router.post(
   "/",
   authenticateToken,
   requireAdmin,
   async (req, res) => {
+
     try {
       const {
         titre,
@@ -118,21 +176,6 @@ router.post(
         return res.status(400).json({
           message:
             "Le titre et la civilisation sont obligatoires.",
-        });
-      }
-
-      const civilisation = await pool.query(
-        `
-        SELECT id
-        FROM civilisations
-        WHERE id = $1
-        `,
-        [civilisation_id]
-      );
-
-      if (civilisation.rows.length === 0) {
-        return res.status(404).json({
-          message: "Civilisation introuvable.",
         });
       }
 
@@ -145,14 +188,11 @@ router.post(
           image,
           civilisation_id
         )
-        VALUES ($1, $2, $3, $4)
-        RETURNING
-          id,
-          titre,
-          description,
-          image,
-          civilisation_id,
-          created_at
+
+        VALUES
+        ($1, $2, $3, $4)
+
+        RETURNING *
         `,
         [
           titre,
@@ -164,13 +204,13 @@ router.post(
 
       res.status(201).json({
         message:
-          "Mythe ou légende ajouté avec succès.",
+          "Mythe ajouté avec succès.",
         mythe: result.rows[0],
       });
 
     } catch (error) {
       console.error(
-        "Erreur ajout mythe :",
+        "❌ Erreur ajout mythe :",
         error
       );
 
@@ -182,17 +222,18 @@ router.post(
 );
 
 
-/* ============================================================
-   PUT - MODIFIER UN MYTHE
-   ============================================================ */
+// ============================================================
+// PUT
+// ============================================================
 
 router.put(
   "/:id",
   authenticateToken,
   requireAdmin,
   async (req, res) => {
+
     try {
-      const id = Number(req.params.id);
+      const { id } = req.params;
 
       const {
         titre,
@@ -201,50 +242,19 @@ router.put(
         civilisation_id,
       } = req.body;
 
-      if (!Number.isInteger(id)) {
-        return res.status(400).json({
-          message: "ID invalide.",
-        });
-      }
-
-      if (!titre || !civilisation_id) {
-        return res.status(400).json({
-          message:
-            "Le titre et la civilisation sont obligatoires.",
-        });
-      }
-
-      const civilisation = await pool.query(
-        `
-        SELECT id
-        FROM civilisations
-        WHERE id = $1
-        `,
-        [civilisation_id]
-      );
-
-      if (civilisation.rows.length === 0) {
-        return res.status(404).json({
-          message: "Civilisation introuvable.",
-        });
-      }
-
       const result = await pool.query(
         `
         UPDATE mythes
+
         SET
           titre = $1,
           description = $2,
           image = $3,
           civilisation_id = $4
+
         WHERE id = $5
-        RETURNING
-          id,
-          titre,
-          description,
-          image,
-          civilisation_id,
-          created_at
+
+        RETURNING *
         `,
         [
           titre,
@@ -257,19 +267,19 @@ router.put(
 
       if (result.rows.length === 0) {
         return res.status(404).json({
-          message: "Mythe ou légende introuvable.",
+          message: "Mythe introuvable.",
         });
       }
 
       res.json({
         message:
-          "Mythe ou légende modifié avec succès.",
+          "Mythe modifié avec succès.",
         mythe: result.rows[0],
       });
 
     } catch (error) {
       console.error(
-        "Erreur modification mythe :",
+        "❌ Erreur modification mythe :",
         error
       );
 
@@ -281,48 +291,42 @@ router.put(
 );
 
 
-/* ============================================================
-   DELETE - SUPPRIMER UN MYTHE
-   ============================================================ */
+// ============================================================
+// DELETE
+// ============================================================
 
 router.delete(
   "/:id",
   authenticateToken,
   requireAdmin,
   async (req, res) => {
-    try {
-      const id = Number(req.params.id);
 
-      if (!Number.isInteger(id)) {
-        return res.status(400).json({
-          message: "ID invalide.",
-        });
-      }
+    try {
+      const { id } = req.params;
 
       const result = await pool.query(
         `
         DELETE FROM mythes
         WHERE id = $1
-        RETURNING id, titre
+        RETURNING *
         `,
         [id]
       );
 
       if (result.rows.length === 0) {
         return res.status(404).json({
-          message: "Mythe ou légende introuvable.",
+          message: "Mythe introuvable.",
         });
       }
 
       res.json({
         message:
-          "Mythe ou légende supprimé avec succès.",
-        mythe: result.rows[0],
+          "Mythe supprimé avec succès.",
       });
 
     } catch (error) {
       console.error(
-        "Erreur suppression mythe :",
+        "❌ Erreur suppression mythe :",
         error
       );
 

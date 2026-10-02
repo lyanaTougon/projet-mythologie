@@ -1,49 +1,39 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./admin.css";
 
 const API_URL = "http://localhost:5000";
 
-const civilisations = [
-  {
-    id: 1,
-    nom: "Mythologie aztèque",
-  },
-  {
-    id: 2,
-    nom: "Mythologie japonaise",
-  },
-  {
-    id: 3,
-    nom: "Mythologie nordique",
-  },
-  {
-    id: 4,
-    nom: "Mythologie égyptienne",
-  },
-];
-
 function Admin() {
-  const [users, setUsers] = useState([]);
-  const [dieux, setDieux] = useState([]);
-  const [heros, setHeros] = useState([]);
-  const [mythes, setMythes] = useState([]);
+  const navigate = useNavigate();
+
+  const [user, setUser] = useState(null);
+  const [activeSection, setActiveSection] = useState("dashboard");
 
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
-  const [activeSection, setActiveSection] = useState("dashboard");
+  const [stats, setStats] = useState({
+    totalUsers: 0,
+    totalDieux: 0,
+    totalHeros: 0,
+    totalMythes: 0,
+  });
 
-  const [editingType, setEditingType] = useState(null);
-  const [editingId, setEditingId] = useState(null);
+  const [users, setUsers] = useState([]);
+  const [dieux, setDieux] = useState([]);
+  const [heros, setHeros] = useState([]);
+  const [mythes, setMythes] = useState([]);
+  const [civilisations, setCivilisations] = useState([]);
 
-  const [dieuForm, setDieuForm] = useState({
+  const [dieuData, setDieuData] = useState({
     nom: "",
     description: "",
     image: "",
     civilisation_id: "",
   });
 
-  const [heroForm, setHeroForm] = useState({
+  const [heroData, setHeroData] = useState({
     nom: "",
     type: "héros",
     description: "",
@@ -51,25 +41,23 @@ function Admin() {
     civilisation_id: "",
   });
 
-  const [mytheForm, setMytheForm] = useState({
+  const [mytheData, setMytheData] = useState({
     titre: "",
     description: "",
     image: "",
     civilisation_id: "",
   });
 
-
-  /* ============================================================
-     TOKEN
-     ============================================================ */
+  const [editingDieu, setEditingDieu] = useState(null);
+  const [editingHero, setEditingHero] = useState(null);
+  const [editingMythe, setEditingMythe] = useState(null);
 
   const getToken = () => {
     return localStorage.getItem("token");
   };
 
-
   /* ============================================================
-     MESSAGE
+     MESSAGES
      ============================================================ */
 
   const showMessage = (text) => {
@@ -90,18 +78,90 @@ function Admin() {
     }, 4000);
   };
 
-
   /* ============================================================
-     CHARGER LES DONNÉES
+     VERIFICATION ADMIN
      ============================================================ */
 
   useEffect(() => {
-    loadUsers();
-    loadDieux();
-    loadHeros();
-    loadMythes();
-  }, []);
+    const token = localStorage.getItem("token");
+    const savedUser = localStorage.getItem("user");
 
+    if (!token || !savedUser) {
+      navigate("/connexion");
+      return;
+    }
+
+    try {
+      const parsedUser = JSON.parse(savedUser);
+
+      if (parsedUser.role !== "admin") {
+        navigate("/");
+        return;
+      }
+
+      setUser(parsedUser);
+    } catch (err) {
+      console.error(err);
+
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+
+      navigate("/connexion");
+    }
+  }, [navigate]);
+
+  /* ============================================================
+     CHARGEMENT
+     ============================================================ */
+
+  useEffect(() => {
+    if (!user) {
+      return;
+    }
+
+    loadData();
+  }, [user]);
+
+  const loadData = async () => {
+    await Promise.all([
+      loadStats(),
+      loadUsers(),
+      loadDieux(),
+      loadHeros(),
+      loadMythes(),
+      loadCivilisations(),
+    ]);
+  };
+
+  /* ============================================================
+     STATISTIQUES
+     ============================================================ */
+
+  const loadStats = async () => {
+    try {
+      const response = await fetch(
+        `${API_URL}/api/admin/stats`,
+        {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        return;
+      }
+
+      setStats((current) => ({
+        ...current,
+        totalUsers: data.totalUsers || 0,
+      }));
+    } catch (err) {
+      console.error("Erreur statistiques :", err);
+    }
+  };
 
   /* ============================================================
      UTILISATEURS
@@ -109,13 +169,11 @@ function Admin() {
 
   const loadUsers = async () => {
     try {
-      const token = getToken();
-
       const response = await fetch(
         `${API_URL}/api/admin/users`,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${getToken()}`,
           },
         }
       );
@@ -123,61 +181,14 @@ function Admin() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message);
+        return;
       }
 
-      setUsers(data.users);
-
-    } catch (error) {
-      console.error(error);
-      showError(
-        error.message ||
-        "Impossible de récupérer les utilisateurs."
-      );
+      setUsers(data.users || []);
+    } catch (err) {
+      console.error("Erreur utilisateurs :", err);
     }
   };
-
-
-  const deleteUser = async (id) => {
-    const confirmation = window.confirm(
-      "Voulez-vous vraiment supprimer cet utilisateur ?"
-    );
-
-    if (!confirmation) {
-      return;
-    }
-
-    try {
-      const token = getToken();
-
-      const response = await fetch(
-        `${API_URL}/api/admin/users/${id}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message);
-      }
-
-      showMessage(data.message);
-
-      loadUsers();
-
-    } catch (error) {
-      showError(
-        error.message ||
-        "Erreur lors de la suppression."
-      );
-    }
-  };
-
 
   /* ============================================================
      DIEUX
@@ -192,143 +203,24 @@ function Admin() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message);
+        return;
       }
 
-      setDieux(data.dieux);
+      const list = data.dieux || [];
 
-    } catch (error) {
-      console.error(error);
+      setDieux(list);
+
+      setStats((current) => ({
+        ...current,
+        totalDieux: list.length,
+      }));
+    } catch (err) {
+      console.error("Erreur dieux :", err);
     }
   };
-
-
-  const resetDieuForm = () => {
-    setDieuForm({
-      nom: "",
-      description: "",
-      image: "",
-      civilisation_id: "",
-    });
-
-    setEditingType(null);
-    setEditingId(null);
-  };
-
-
-  const submitDieu = async (event) => {
-    event.preventDefault();
-
-    try {
-      const token = getToken();
-
-      const url = editingId
-        ? `${API_URL}/api/dieux/${editingId}`
-        : `${API_URL}/api/dieux`;
-
-      const method = editingId
-        ? "PUT"
-        : "POST";
-
-      const response = await fetch(url, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          nom: dieuForm.nom,
-          description: dieuForm.description,
-          image: dieuForm.image || null,
-          civilisation_id: Number(
-            dieuForm.civilisation_id
-          ),
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message);
-      }
-
-      showMessage(data.message);
-
-      resetDieuForm();
-      loadDieux();
-
-    } catch (error) {
-      showError(
-        error.message ||
-        "Erreur lors de l'enregistrement."
-      );
-    }
-  };
-
-
-  const editDieu = (dieu) => {
-    setActiveSection("dieux");
-    setEditingType("dieu");
-    setEditingId(dieu.id);
-
-    setDieuForm({
-      nom: dieu.nom || "",
-      description: dieu.description || "",
-      image: dieu.image || "",
-      civilisation_id:
-        dieu.civilisation_id?.toString() || "",
-    });
-
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
-  };
-
-
-  const deleteDieu = async (id) => {
-    const confirmation = window.confirm(
-      "Voulez-vous vraiment supprimer ce dieu ou cette déesse ?"
-    );
-
-    if (!confirmation) {
-      return;
-    }
-
-    try {
-      const token = getToken();
-
-      const response = await fetch(
-        `${API_URL}/api/dieux/${id}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message);
-      }
-
-      showMessage(data.message);
-
-      loadDieux();
-
-    } catch (error) {
-      showError(
-        error.message ||
-        "Erreur lors de la suppression."
-      );
-    }
-  };
-
 
   /* ============================================================
-     HÉROS / CRÉATURES
+     HEROS
      ============================================================ */
 
   const loadHeros = async () => {
@@ -340,143 +232,21 @@ function Admin() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message);
+        return;
       }
 
-      setHeros(data.heros);
+      const list = data.heros || [];
 
-    } catch (error) {
-      console.error(error);
+      setHeros(list);
+
+      setStats((current) => ({
+        ...current,
+        totalHeros: list.length,
+      }));
+    } catch (err) {
+      console.error("Erreur héros :", err);
     }
   };
-
-
-  const resetHeroForm = () => {
-    setHeroForm({
-      nom: "",
-      type: "héros",
-      description: "",
-      image: "",
-      civilisation_id: "",
-    });
-
-    setEditingType(null);
-    setEditingId(null);
-  };
-
-
-  const submitHero = async (event) => {
-    event.preventDefault();
-
-    try {
-      const token = getToken();
-
-      const url = editingId
-        ? `${API_URL}/api/heros/${editingId}`
-        : `${API_URL}/api/heros`;
-
-      const method = editingId
-        ? "PUT"
-        : "POST";
-
-      const response = await fetch(url, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          nom: heroForm.nom,
-          type: heroForm.type,
-          description: heroForm.description,
-          image: heroForm.image || null,
-          civilisation_id: Number(
-            heroForm.civilisation_id
-          ),
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message);
-      }
-
-      showMessage(data.message);
-
-      resetHeroForm();
-      loadHeros();
-
-    } catch (error) {
-      showError(
-        error.message ||
-        "Erreur lors de l'enregistrement."
-      );
-    }
-  };
-
-
-  const editHero = (hero) => {
-    setActiveSection("heros");
-    setEditingType("hero");
-    setEditingId(hero.id);
-
-    setHeroForm({
-      nom: hero.nom || "",
-      type: hero.type || "héros",
-      description: hero.description || "",
-      image: hero.image || "",
-      civilisation_id:
-        hero.civilisation_id?.toString() || "",
-    });
-
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
-  };
-
-
-  const deleteHero = async (id) => {
-    const confirmation = window.confirm(
-      "Voulez-vous vraiment supprimer cet élément ?"
-    );
-
-    if (!confirmation) {
-      return;
-    }
-
-    try {
-      const token = getToken();
-
-      const response = await fetch(
-        `${API_URL}/api/heros/${id}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message);
-      }
-
-      showMessage(data.message);
-
-      loadHeros();
-
-    } catch (error) {
-      showError(
-        error.message ||
-        "Erreur lors de la suppression."
-      );
-    }
-  };
-
 
   /* ============================================================
      MYTHES
@@ -491,103 +261,92 @@ function Admin() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message);
+        return;
       }
 
-      setMythes(data.mythes);
+      const list = data.mythes || [];
 
-    } catch (error) {
-      console.error(error);
+      setMythes(list);
+
+      setStats((current) => ({
+        ...current,
+        totalMythes: list.length,
+      }));
+    } catch (err) {
+      console.error("Erreur mythes :", err);
     }
   };
 
+  /* ============================================================
+     CIVILISATIONS
+     ============================================================ */
 
-  const resetMytheForm = () => {
-    setMytheForm({
-      titre: "",
-      description: "",
-      image: "",
-      civilisation_id: "",
-    });
-
-    setEditingType(null);
-    setEditingId(null);
-  };
-
-
-  const submitMythe = async (event) => {
-    event.preventDefault();
-
+  const loadCivilisations = async () => {
     try {
-      const token = getToken();
+      const response = await fetch(
+        `${API_URL}/api/civilisations`
+      );
 
-      const url = editingId
-        ? `${API_URL}/api/mythes/${editingId}`
-        : `${API_URL}/api/mythes`;
+      if (response.ok) {
+        const data = await response.json();
 
-      const method = editingId
-        ? "PUT"
-        : "POST";
+        setCivilisations(
+          data.civilisations || []
+        );
 
-      const response = await fetch(url, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          titre: mytheForm.titre,
-          description: mytheForm.description,
-          image: mytheForm.image || null,
-          civilisation_id: Number(
-            mytheForm.civilisation_id
-          ),
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message);
+        return;
       }
-
-      showMessage(data.message);
-
-      resetMytheForm();
-      loadMythes();
-
-    } catch (error) {
-      showError(
-        error.message ||
-        "Erreur lors de l'enregistrement."
+    } catch (err) {
+      console.log(
+        "Route civilisations non disponible."
       );
     }
+
+    setCivilisations([
+      {
+        id: 1,
+        nom: "Mythologie aztèque",
+      },
+      {
+        id: 2,
+        nom: "Mythologie japonaise",
+      },
+      {
+        id: 3,
+        nom: "Mythologie nordique",
+      },
+      {
+        id: 4,
+        nom: "Mythologie égyptienne",
+      },
+    ]);
   };
 
+  /* ============================================================
+     DECONNEXION
+     ============================================================ */
 
-  const editMythe = (mythe) => {
-    setActiveSection("mythes");
-    setEditingType("mythe");
-    setEditingId(mythe.id);
+  const logout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
 
-    setMytheForm({
-      titre: mythe.titre || "",
-      description: mythe.description || "",
-      image: mythe.image || "",
-      civilisation_id:
-        mythe.civilisation_id?.toString() || "",
-    });
-
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
+    navigate("/connexion");
   };
 
+  /* ============================================================
+     UTILISATEURS - SUPPRESSION
+     ============================================================ */
 
-  const deleteMythe = async (id) => {
+  const deleteUser = async (id) => {
+    if (Number(id) === Number(user?.id)) {
+      showError(
+        "Vous ne pouvez pas supprimer votre propre compte."
+      );
+      return;
+    }
+
     const confirmation = window.confirm(
-      "Voulez-vous vraiment supprimer ce mythe ou cette légende ?"
+      "Voulez-vous vraiment supprimer cet utilisateur ?"
     );
 
     if (!confirmation) {
@@ -595,14 +354,12 @@ function Admin() {
     }
 
     try {
-      const token = getToken();
-
       const response = await fetch(
-        `${API_URL}/api/mythes/${id}`,
+        `${API_URL}/api/admin/users/${id}`,
         {
           method: "DELETE",
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${getToken()}`,
           },
         }
       );
@@ -610,21 +367,601 @@ function Admin() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message);
+        throw new Error(
+          data.message ||
+            "Impossible de supprimer l'utilisateur."
+        );
       }
 
-      showMessage(data.message);
-
-      loadMythes();
-
-    } catch (error) {
-      showError(
-        error.message ||
-        "Erreur lors de la suppression."
+      showMessage(
+        "Utilisateur supprimé avec succès."
       );
+
+      await loadUsers();
+      await loadStats();
+    } catch (err) {
+      showError(err.message);
     }
   };
 
+  /* ============================================================
+     DIEU - CHANGEMENT FORMULAIRE
+     ============================================================ */
+
+  const handleDieuChange = (event) => {
+    const { name, value } = event.target;
+
+    setDieuData((current) => ({
+      ...current,
+      [name]: value,
+    }));
+  };
+
+  /* ============================================================
+     DIEU - AJOUT
+     ============================================================ */
+
+  const addDieu = async (event) => {
+    event.preventDefault();
+
+    try {
+      const response = await fetch(
+        `${API_URL}/api/dieux`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${getToken()}`,
+          },
+          body: JSON.stringify({
+            nom: dieuData.nom,
+            description: dieuData.description,
+            image: dieuData.image,
+            civilisation_id: Number(
+              dieuData.civilisation_id
+            ),
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.message ||
+            "Impossible d'ajouter le dieu."
+        );
+      }
+
+      showMessage("Dieu ajouté avec succès.");
+
+      resetDieu();
+
+      await loadDieux();
+    } catch (err) {
+      showError(err.message);
+    }
+  };
+
+  /* ============================================================
+     DIEU - MODIFICATION
+     ============================================================ */
+
+  const editDieu = (dieu) => {
+    setEditingDieu(dieu);
+
+    setDieuData({
+      nom: dieu.nom || "",
+      description: dieu.description || "",
+      image: dieu.image || "",
+      civilisation_id:
+        dieu.civilisation_id || "",
+    });
+
+    setActiveSection("dieux");
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
+
+  const updateDieu = async (event) => {
+    event.preventDefault();
+
+    if (!editingDieu) {
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `${API_URL}/api/dieux/${editingDieu.id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${getToken()}`,
+          },
+          body: JSON.stringify({
+            nom: dieuData.nom,
+            description: dieuData.description,
+            image: dieuData.image,
+            civilisation_id: Number(
+              dieuData.civilisation_id
+            ),
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.message ||
+            "Impossible de modifier le dieu."
+        );
+      }
+
+      showMessage(
+        "Dieu modifié avec succès."
+      );
+
+      setEditingDieu(null);
+      resetDieu();
+
+      await loadDieux();
+    } catch (err) {
+      showError(err.message);
+    }
+  };
+
+  /* ============================================================
+     DIEU - SUPPRESSION
+     ============================================================ */
+
+  const deleteDieu = async (id) => {
+    const confirmation = window.confirm(
+      "Voulez-vous vraiment supprimer ce dieu ?"
+    );
+
+    if (!confirmation) {
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `${API_URL}/api/dieux/${id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.message ||
+            "Impossible de supprimer le dieu."
+        );
+      }
+
+      showMessage(
+        "Dieu supprimé avec succès."
+      );
+
+      await loadDieux();
+    } catch (err) {
+      showError(err.message);
+    }
+  };
+
+  /* ============================================================
+     HEROS - CHANGEMENT FORMULAIRE
+     ============================================================ */
+
+  const handleHeroChange = (event) => {
+    const { name, value } = event.target;
+
+    setHeroData((current) => ({
+      ...current,
+      [name]: value,
+    }));
+  };
+
+  /* ============================================================
+     HEROS - AJOUT
+     ============================================================ */
+
+  const addHero = async (event) => {
+    event.preventDefault();
+
+    try {
+      const response = await fetch(
+        `${API_URL}/api/heros`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${getToken()}`,
+          },
+          body: JSON.stringify({
+            nom: heroData.nom,
+            type: heroData.type,
+            description: heroData.description,
+            image: heroData.image,
+            civilisation_id: Number(
+              heroData.civilisation_id
+            ),
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.message ||
+            "Impossible d'ajouter la fiche."
+        );
+      }
+
+      showMessage(
+        "Fiche ajoutée avec succès."
+      );
+
+      resetHero();
+
+      await loadHeros();
+    } catch (err) {
+      showError(err.message);
+    }
+  };
+
+  /* ============================================================
+     HEROS - MODIFICATION
+     ============================================================ */
+
+  const editHero = (hero) => {
+    setEditingHero(hero);
+
+    setHeroData({
+      nom: hero.nom || "",
+      type: hero.type || "héros",
+      description: hero.description || "",
+      image: hero.image || "",
+      civilisation_id:
+        hero.civilisation_id || "",
+    });
+
+    setActiveSection("heros");
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
+
+  const updateHero = async (event) => {
+    event.preventDefault();
+
+    if (!editingHero) {
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `${API_URL}/api/heros/${editingHero.id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${getToken()}`,
+          },
+          body: JSON.stringify({
+            nom: heroData.nom,
+            type: heroData.type,
+            description: heroData.description,
+            image: heroData.image,
+            civilisation_id: Number(
+              heroData.civilisation_id
+            ),
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.message ||
+            "Impossible de modifier la fiche."
+        );
+      }
+
+      showMessage(
+        "Fiche modifiée avec succès."
+      );
+
+      setEditingHero(null);
+      resetHero();
+
+      await loadHeros();
+    } catch (err) {
+      showError(err.message);
+    }
+  };
+
+  /* ============================================================
+     HEROS - SUPPRESSION
+     ============================================================ */
+
+  const deleteHero = async (id) => {
+    const confirmation = window.confirm(
+      "Voulez-vous vraiment supprimer cette fiche ?"
+    );
+
+    if (!confirmation) {
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `${API_URL}/api/heros/${id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.message ||
+            "Impossible de supprimer la fiche."
+        );
+      }
+
+      showMessage(
+        "Fiche supprimée avec succès."
+      );
+
+      await loadHeros();
+    } catch (err) {
+      showError(err.message);
+    }
+  };
+
+  /* ============================================================
+     MYTHE - CHANGEMENT FORMULAIRE
+     ============================================================ */
+
+  const handleMytheChange = (event) => {
+    const { name, value } = event.target;
+
+    setMytheData((current) => ({
+      ...current,
+      [name]: value,
+    }));
+  };
+
+  /* ============================================================
+     MYTHE - AJOUT
+     ============================================================ */
+
+  const addMythe = async (event) => {
+    event.preventDefault();
+
+    try {
+      const response = await fetch(
+        `${API_URL}/api/mythes`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${getToken()}`,
+          },
+          body: JSON.stringify({
+            titre: mytheData.titre,
+            description: mytheData.description,
+            image: mytheData.image,
+            civilisation_id: Number(
+              mytheData.civilisation_id
+            ),
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.message ||
+            "Impossible d'ajouter le mythe."
+        );
+      }
+
+      showMessage(
+        "Mythe ajouté avec succès."
+      );
+
+      resetMythe();
+
+      await loadMythes();
+    } catch (err) {
+      showError(err.message);
+    }
+  };
+
+  /* ============================================================
+     MYTHE - MODIFICATION
+     ============================================================ */
+
+  const editMythe = (mythe) => {
+    setEditingMythe(mythe);
+
+    setMytheData({
+      titre: mythe.titre || "",
+      description: mythe.description || "",
+      image: mythe.image || "",
+      civilisation_id:
+        mythe.civilisation_id || "",
+    });
+
+    setActiveSection("mythes");
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
+
+  const updateMythe = async (event) => {
+    event.preventDefault();
+
+    if (!editingMythe) {
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `${API_URL}/api/mythes/${editingMythe.id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${getToken()}`,
+          },
+          body: JSON.stringify({
+            titre: mytheData.titre,
+            description: mytheData.description,
+            image: mytheData.image,
+            civilisation_id: Number(
+              mytheData.civilisation_id
+            ),
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.message ||
+            "Impossible de modifier le mythe."
+        );
+      }
+
+      showMessage(
+        "Mythe modifié avec succès."
+      );
+
+      setEditingMythe(null);
+      resetMythe();
+
+      await loadMythes();
+    } catch (err) {
+      showError(err.message);
+    }
+  };
+
+  /* ============================================================
+     MYTHE - SUPPRESSION
+     ============================================================ */
+
+  const deleteMythe = async (id) => {
+    const confirmation = window.confirm(
+      "Voulez-vous vraiment supprimer ce mythe ?"
+    );
+
+    if (!confirmation) {
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `${API_URL}/api/mythes/${id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.message ||
+            "Impossible de supprimer le mythe."
+        );
+      }
+
+      showMessage(
+        "Mythe supprimé avec succès."
+      );
+
+      await loadMythes();
+    } catch (err) {
+      showError(err.message);
+    }
+  };
+
+  /* ============================================================
+     RESET FORMULAIRES
+     ============================================================ */
+
+  const resetDieu = () => {
+    setDieuData({
+      nom: "",
+      description: "",
+      image: "",
+      civilisation_id: "",
+    });
+  };
+
+  const resetHero = () => {
+    setHeroData({
+      nom: "",
+      type: "héros",
+      description: "",
+      image: "",
+      civilisation_id: "",
+    });
+  };
+
+  const resetMythe = () => {
+    setMytheData({
+      titre: "",
+      description: "",
+      image: "",
+      civilisation_id: "",
+    });
+  };
+
+  const cancelEdit = () => {
+    setEditingDieu(null);
+    setEditingHero(null);
+    setEditingMythe(null);
+
+    resetDieu();
+    resetHero();
+    resetMythe();
+  };
+
+  /* ============================================================
+     PROTECTION
+     ============================================================ */
+
+  if (!user || user.role !== "admin") {
+    return null;
+  }
 
   /* ============================================================
      AFFICHAGE
@@ -633,851 +970,961 @@ function Admin() {
   return (
     <main className="admin-page">
 
-      <div className="admin-header">
-        <div>
-          <p className="admin-small-title">
-            ESPACE ADMINISTRATEUR
-          </p>
+      <aside className="admin-sidebar">
 
-          <h1>
-            Administration
-          </h1>
-
-          <p>
-            Gérez les utilisateurs et le contenu
-            du site Mythologie.
-          </p>
+        <div className="admin-logo">
+          <span>🏛️</span>
+          <strong>Mythologie</strong>
         </div>
-      </div>
 
-
-      {/* ========================================================
-          MESSAGES
-          ======================================================== */}
-
-      {message && (
-        <div className="admin-message success">
-          {message}
+        <div className="admin-title">
+          Administration
         </div>
-      )}
 
-      {error && (
-        <div className="admin-message error">
-          {error}
+        <nav className="admin-menu">
+
+          <button
+            className={
+              activeSection === "dashboard"
+                ? "active"
+                : ""
+            }
+            onClick={() => {
+              cancelEdit();
+              setActiveSection("dashboard");
+            }}
+          >
+            📊
+            <span>Tableau de bord</span>
+          </button>
+
+          <button
+            className={
+              activeSection === "users"
+                ? "active"
+                : ""
+            }
+            onClick={() => {
+              cancelEdit();
+              setActiveSection("users");
+            }}
+          >
+            👥
+            <span>Utilisateurs</span>
+          </button>
+
+          <button
+            className={
+              activeSection === "dieux"
+                ? "active"
+                : ""
+            }
+            onClick={() => {
+              cancelEdit();
+              setActiveSection("dieux");
+            }}
+          >
+            🏛️
+            <span>Dieux & déesses</span>
+          </button>
+
+          <button
+            className={
+              activeSection === "heros"
+                ? "active"
+                : ""
+            }
+            onClick={() => {
+              cancelEdit();
+              setActiveSection("heros");
+            }}
+          >
+            ⚔️
+            <span>Héros & créatures</span>
+          </button>
+
+          <button
+            className={
+              activeSection === "mythes"
+                ? "active"
+                : ""
+            }
+            onClick={() => {
+              cancelEdit();
+              setActiveSection("mythes");
+            }}
+          >
+            📜
+            <span>Mythes & légendes</span>
+          </button>
+
+        </nav>
+
+        <div className="admin-sidebar-bottom">
+
+          <button
+            className="admin-home-button"
+            onClick={() => navigate("/")}
+          >
+            🏠
+            <span>Retour au site</span>
+          </button>
+
+          <button
+            className="admin-logout-button"
+            onClick={logout}
+          >
+            🚪
+            <span>Déconnexion</span>
+          </button>
+
         </div>
-      )}
 
+      </aside>
 
-      {/* ========================================================
-          MENU ADMIN
-          ======================================================== */}
+      <section className="admin-content">
 
-      <div className="admin-tabs">
+        <header className="admin-header">
 
-        <button
-          className={
-            activeSection === "dashboard"
-              ? "active"
-              : ""
-          }
-          onClick={() =>
-            setActiveSection("dashboard")
-          }
-        >
-          📊 Tableau de bord
-        </button>
+          <div>
+            <h1>Administration</h1>
 
-        <button
-          className={
-            activeSection === "users"
-              ? "active"
-              : ""
-          }
-          onClick={() =>
-            setActiveSection("users")
-          }
-        >
-          👥 Utilisateurs
-        </button>
-
-        <button
-          className={
-            activeSection === "dieux"
-              ? "active"
-              : ""
-          }
-          onClick={() =>
-            setActiveSection("dieux")
-          }
-        >
-          🏛️ Dieux & déesses
-        </button>
-
-        <button
-          className={
-            activeSection === "heros"
-              ? "active"
-              : ""
-          }
-          onClick={() =>
-            setActiveSection("heros")
-          }
-        >
-          ⚔️ Héros & créatures
-        </button>
-
-        <button
-          className={
-            activeSection === "mythes"
-              ? "active"
-              : ""
-          }
-          onClick={() =>
-            setActiveSection("mythes")
-          }
-        >
-          📜 Mythes & légendes
-        </button>
-
-      </div>
-
-
-      {/* ========================================================
-          DASHBOARD
-          ======================================================== */}
-
-      {activeSection === "dashboard" && (
-        <section className="admin-section">
-
-          <h2>
-            Tableau de bord
-          </h2>
-
-          <div className="admin-stat-grid">
-
-            <div className="admin-stat-card">
-              <span>👥</span>
-              <strong>{users.length}</strong>
-              <p>Utilisateurs</p>
-            </div>
-
-            <div className="admin-stat-card">
-              <span>🏛️</span>
-              <strong>{dieux.length}</strong>
-              <p>Dieux & déesses</p>
-            </div>
-
-            <div className="admin-stat-card">
-              <span>⚔️</span>
-              <strong>{heros.length}</strong>
-              <p>Héros & créatures</p>
-            </div>
-
-            <div className="admin-stat-card">
-              <span>📜</span>
-              <strong>{mythes.length}</strong>
-              <p>Mythes & légendes</p>
-            </div>
-
+            <p>
+              Bienvenue,{" "}
+              <strong>{user.username}</strong>
+            </p>
           </div>
 
-        </section>
-      )}
+          <div className="admin-header-user">
+            👑 Administrateur
+          </div>
 
+        </header>
 
-      {/* ========================================================
-          UTILISATEURS
-          ======================================================== */}
+        {message && (
+          <div className="admin-message success">
+            ✅ {message}
+          </div>
+        )}
 
-      {activeSection === "users" && (
-        <section className="admin-section">
+        {error && (
+          <div className="admin-message error">
+            ❌ {error}
+          </div>
+        )}
 
-          <h2>
-            👥 Gestion des utilisateurs
-          </h2>
+        {/* ======================================================
+            DASHBOARD
+            ====================================================== */}
 
-          <div className="admin-table-wrapper">
+        {activeSection === "dashboard" && (
+          <section>
 
-            <table className="admin-table">
+            <div className="admin-section-header">
+              <h2>📊 Tableau de bord</h2>
 
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Nom</th>
-                  <th>Email</th>
-                  <th>Rôle</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
+              <p>
+                Vue générale du site.
+              </p>
+            </div>
 
-              <tbody>
+            <div className="stats-grid">
 
-                {users.map((user) => (
-                  <tr key={user.id}>
+              <div className="stat-card">
+                <div className="stat-icon">
+                  👥
+                </div>
 
-                    <td>{user.id}</td>
+                <div>
+                  <span>Utilisateurs</span>
+                  <strong>
+                    {stats.totalUsers}
+                  </strong>
+                </div>
+              </div>
 
-                    <td>{user.username}</td>
+              <div className="stat-card">
+                <div className="stat-icon">
+                  🏛️
+                </div>
 
-                    <td>{user.email}</td>
+                <div>
+                  <span>Dieux & déesses</span>
+                  <strong>
+                    {stats.totalDieux}
+                  </strong>
+                </div>
+              </div>
 
-                    <td>
-                      <span
-                        className={
-                          user.role === "admin"
-                            ? "role-admin"
-                            : "role-user"
+              <div className="stat-card">
+                <div className="stat-icon">
+                  ⚔️
+                </div>
+
+                <div>
+                  <span>Héros & créatures</span>
+                  <strong>
+                    {stats.totalHeros}
+                  </strong>
+                </div>
+              </div>
+
+              <div className="stat-card">
+                <div className="stat-icon">
+                  📜
+                </div>
+
+                <div>
+                  <span>Mythes & légendes</span>
+                  <strong>
+                    {stats.totalMythes}
+                  </strong>
+                </div>
+              </div>
+
+            </div>
+
+            <div className="dashboard-welcome">
+
+              <div className="dashboard-welcome-icon">
+                🏛️
+              </div>
+
+              <div>
+                <h3>
+                  Panneau d'administration
+                </h3>
+
+                <p>
+                  Gérez les utilisateurs,
+                  les dieux, les héros,
+                  les créatures, les mythes
+                  et les légendes du site.
+                </p>
+              </div>
+
+            </div>
+
+          </section>
+        )}
+
+        {/* ======================================================
+            UTILISATEURS
+            ====================================================== */}
+
+        {activeSection === "users" && (
+          <section>
+
+            <div className="admin-section-header">
+              <h2>👥 Utilisateurs</h2>
+
+              <p>
+                Gestion des comptes utilisateurs.
+              </p>
+            </div>
+
+            <div className="admin-table-container">
+
+              <table className="admin-table">
+
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Utilisateur</th>
+                    <th>Email</th>
+                    <th>Rôle</th>
+                    <th>Date</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+
+                  {users.length === 0 ? (
+                    <tr>
+                      <td
+                        colSpan="6"
+                        className="empty-table"
+                      >
+                        Aucun utilisateur.
+                      </td>
+                    </tr>
+                  ) : (
+                    users.map((item) => (
+                      <tr key={item.id}>
+
+                        <td>#{item.id}</td>
+
+                        <td>
+                          <strong>
+                            {item.username}
+                          </strong>
+                        </td>
+
+                        <td>{item.email}</td>
+
+                        <td>
+                          <span
+                            className={
+                              item.role === "admin"
+                                ? "role admin"
+                                : "role user"
+                            }
+                          >
+                            {item.role === "admin"
+                              ? "👑 Admin"
+                              : "👤 User"}
+                          </span>
+                        </td>
+
+                        <td>
+                          {item.created_at
+                            ? new Date(
+                                item.created_at
+                              ).toLocaleDateString(
+                                "fr-FR"
+                              )
+                            : "-"}
+                        </td>
+
+                        <td>
+                          {Number(item.id) ===
+                          Number(user.id) ? (
+                            <span className="current-user">
+                              Votre compte
+                            </span>
+                          ) : (
+                            <button
+                              className="delete-button"
+                              onClick={() =>
+                                deleteUser(item.id)
+                              }
+                            >
+                              🗑️ Supprimer
+                            </button>
+                          )}
+                        </td>
+
+                      </tr>
+                    ))
+                  )}
+
+                </tbody>
+
+              </table>
+
+            </div>
+
+          </section>
+        )}
+
+        {/* ======================================================
+            DIEUX
+            ====================================================== */}
+
+        {activeSection === "dieux" && (
+          <section>
+
+            <div className="admin-section-header">
+              <h2>🏛️ Dieux & déesses</h2>
+
+              <p>
+                Ajouter, modifier ou supprimer
+                des divinités.
+              </p>
+            </div>
+
+            <div className="admin-form-card">
+
+              <h3>
+                {editingDieu
+                  ? "✏️ Modifier la fiche"
+                  : "➕ Ajouter un dieu ou une déesse"}
+              </h3>
+
+              <form
+                onSubmit={
+                  editingDieu
+                    ? updateDieu
+                    : addDieu
+                }
+              >
+
+                <div className="form-grid">
+
+                  <div className="form-group">
+                    <label>Nom</label>
+
+                    <input
+                      type="text"
+                      name="nom"
+                      value={dieuData.nom}
+                      onChange={handleDieuChange}
+                      placeholder="Ex : Quetzalcóatl"
+                      required
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label>Civilisation</label>
+
+                    <select
+                      name="civilisation_id"
+                      value={
+                        dieuData.civilisation_id
+                      }
+                      onChange={handleDieuChange}
+                      required
+                    >
+                      <option value="">
+                        Choisir une civilisation
+                      </option>
+
+                      {civilisations.map(
+                        (civilisation) => (
+                          <option
+                            key={civilisation.id}
+                            value={civilisation.id}
+                          >
+                            {civilisation.nom}
+                          </option>
+                        )
+                      )}
+                    </select>
+                  </div>
+
+                </div>
+
+                <div className="form-group">
+                  <label>URL de l'image</label>
+
+                  <input
+                    type="text"
+                    name="image"
+                    value={dieuData.image}
+                    onChange={handleDieuChange}
+                    placeholder="https://..."
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>Description</label>
+
+                  <textarea
+                    name="description"
+                    value={dieuData.description}
+                    onChange={handleDieuChange}
+                    placeholder="Description..."
+                    rows="5"
+                    required
+                  />
+                </div>
+
+                <div className="form-actions">
+
+                  <button
+                    type="submit"
+                    className="save-button"
+                  >
+                    {editingDieu
+                      ? "💾 Enregistrer"
+                      : "➕ Ajouter"}
+                  </button>
+
+                  {editingDieu && (
+                    <button
+                      type="button"
+                      className="cancel-button"
+                      onClick={cancelEdit}
+                    >
+                      Annuler
+                    </button>
+                  )}
+
+                </div>
+
+              </form>
+
+            </div>
+
+            <div className="content-list">
+
+              {dieux.map((dieu) => (
+                <article
+                  className="admin-content-card"
+                  key={dieu.id}
+                >
+
+                  {dieu.image ? (
+                    <img
+                      src={dieu.image}
+                      alt={dieu.nom}
+                    />
+                  ) : (
+                    <div className="admin-card-no-image">
+                      🏛️
+                    </div>
+                  )}
+
+                  <div className="admin-card-info">
+
+                    <span className="content-tag">
+                      {dieu.civilisation_nom ||
+                        "Civilisation"}
+                    </span>
+
+                    <h3>{dieu.nom}</h3>
+
+                    <p>
+                      {dieu.description}
+                    </p>
+
+                    <div className="card-actions">
+
+                      <button
+                        className="edit-button"
+                        onClick={() =>
+                          editDieu(dieu)
                         }
                       >
-                        {user.role}
-                      </span>
-                    </td>
-
-                    <td>
+                        ✏️ Modifier
+                      </button>
 
                       <button
                         className="delete-button"
                         onClick={() =>
-                          deleteUser(user.id)
+                          deleteDieu(dieu.id)
                         }
                       >
                         🗑️ Supprimer
                       </button>
 
-                    </td>
+                    </div>
 
-                  </tr>
-                ))}
+                  </div>
 
-              </tbody>
-
-            </table>
-
-          </div>
-
-        </section>
-      )}
-
-
-      {/* ========================================================
-          DIEUX
-          ======================================================== */}
-
-      {activeSection === "dieux" && (
-        <section className="admin-section">
-
-          <h2>
-            🏛️ Dieux & déesses
-          </h2>
-
-
-          <form
-            className="admin-form"
-            onSubmit={submitDieu}
-          >
-
-            <h3>
-              {editingType === "dieu"
-                ? "✏️ Modifier un dieu / une déesse"
-                : "➕ Ajouter un dieu / une déesse"}
-            </h3>
-
-
-            <label>
-              Nom
-            </label>
-
-            <input
-              type="text"
-              value={dieuForm.nom}
-              onChange={(event) =>
-                setDieuForm({
-                  ...dieuForm,
-                  nom: event.target.value,
-                })
-              }
-              placeholder="Ex : Quetzalcóatl"
-              required
-            />
-
-
-            <label>
-              Description
-            </label>
-
-            <textarea
-              value={dieuForm.description}
-              onChange={(event) =>
-                setDieuForm({
-                  ...dieuForm,
-                  description:
-                    event.target.value,
-                })
-              }
-              placeholder="Description..."
-              rows="5"
-            />
-
-
-            <label>
-              Image
-            </label>
-
-            <input
-              type="text"
-              value={dieuForm.image}
-              onChange={(event) =>
-                setDieuForm({
-                  ...dieuForm,
-                  image: event.target.value,
-                })
-              }
-              placeholder="URL de l'image"
-            />
-
-
-            <label>
-              Civilisation
-            </label>
-
-            <select
-              value={dieuForm.civilisation_id}
-              onChange={(event) =>
-                setDieuForm({
-                  ...dieuForm,
-                  civilisation_id:
-                    event.target.value,
-                })
-              }
-              required
-            >
-
-              <option value="">
-                Sélectionner une civilisation
-              </option>
-
-              {civilisations.map(
-                (civilisation) => (
-                  <option
-                    key={civilisation.id}
-                    value={civilisation.id}
-                  >
-                    {civilisation.nom}
-                  </option>
-                )
-              )}
-
-            </select>
-
-
-            <div className="form-actions">
-
-              <button
-                type="submit"
-                className="save-button"
-              >
-                {editingType === "dieu"
-                  ? "💾 Modifier"
-                  : "➕ Ajouter"}
-              </button>
-
-              {editingType === "dieu" && (
-                <button
-                  type="button"
-                  className="cancel-button"
-                  onClick={resetDieuForm}
-                >
-                  Annuler
-                </button>
-              )}
+                </article>
+              ))}
 
             </div>
 
-          </form>
+          </section>
+        )}
 
+        {/* ======================================================
+            HEROS ET CREATURES
+            ====================================================== */}
 
-          <div className="admin-content-list">
+        {activeSection === "heros" && (
+          <section>
 
-            {dieux.map((dieu) => (
-              <article
-                className="content-card"
-                key={dieu.id}
+            <div className="admin-section-header">
+              <h2>⚔️ Héros & créatures</h2>
+
+              <p>
+                Ajouter, modifier ou supprimer
+                des héros et créatures.
+              </p>
+            </div>
+
+            <div className="admin-form-card">
+
+              <h3>
+                {editingHero
+                  ? "✏️ Modifier la fiche"
+                  : "➕ Ajouter une fiche"}
+              </h3>
+
+              <form
+                onSubmit={
+                  editingHero
+                    ? updateHero
+                    : addHero
+                }
               >
 
-                <div>
+                <div className="form-grid">
 
-                  <span className="content-id">
-                    #{dieu.id}
-                  </span>
+                  <div className="form-group">
+                    <label>Nom</label>
 
-                  <h3>
-                    {dieu.nom}
-                  </h3>
+                    <input
+                      type="text"
+                      name="nom"
+                      value={heroData.nom}
+                      onChange={handleHeroChange}
+                      placeholder="Ex : Thor"
+                      required
+                    />
+                  </div>
 
-                  <p className="content-civilisation">
-                    {dieu.civilisation}
-                  </p>
+                  <div className="form-group">
+                    <label>Type</label>
 
-                  <p>
-                    {dieu.description ||
-                      "Aucune description."}
-                  </p>
+                    <select
+                      name="type"
+                      value={heroData.type}
+                      onChange={handleHeroChange}
+                      required
+                    >
+                      <option value="héros">
+                        ⚔️ Héros
+                      </option>
+
+                      <option value="créature">
+                        🐉 Créature
+                      </option>
+                    </select>
+                  </div>
 
                 </div>
 
-                <div className="content-actions">
+                <div className="form-group">
+                  <label>Civilisation</label>
+
+                  <select
+                    name="civilisation_id"
+                    value={
+                      heroData.civilisation_id
+                    }
+                    onChange={handleHeroChange}
+                    required
+                  >
+                    <option value="">
+                      Choisir une civilisation
+                    </option>
+
+                    {civilisations.map(
+                      (civilisation) => (
+                        <option
+                          key={civilisation.id}
+                          value={civilisation.id}
+                        >
+                          {civilisation.nom}
+                        </option>
+                      )
+                    )}
+                  </select>
+                </div>
+
+                <div className="form-group">
+                  <label>URL de l'image</label>
+
+                  <input
+                    type="text"
+                    name="image"
+                    value={heroData.image}
+                    onChange={handleHeroChange}
+                    placeholder="https://..."
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>Description</label>
+
+                  <textarea
+                    name="description"
+                    value={heroData.description}
+                    onChange={handleHeroChange}
+                    placeholder="Description..."
+                    rows="5"
+                    required
+                  />
+                </div>
+
+                <div className="form-actions">
 
                   <button
-                    className="edit-button"
-                    onClick={() =>
-                      editDieu(dieu)
-                    }
+                    type="submit"
+                    className="save-button"
                   >
-                    ✏️ Modifier
+                    {editingHero
+                      ? "💾 Enregistrer"
+                      : "➕ Ajouter"}
                   </button>
 
-                  <button
-                    className="delete-button"
-                    onClick={() =>
-                      deleteDieu(dieu.id)
-                    }
-                  >
-                    🗑️ Supprimer
-                  </button>
+                  {editingHero && (
+                    <button
+                      type="button"
+                      className="cancel-button"
+                      onClick={cancelEdit}
+                    >
+                      Annuler
+                    </button>
+                  )}
 
                 </div>
 
-              </article>
-            ))}
-
-          </div>
-
-        </section>
-      )}
-
-
-      {/* ========================================================
-          HÉROS / CRÉATURES
-          ======================================================== */}
-
-      {activeSection === "heros" && (
-        <section className="admin-section">
-
-          <h2>
-            ⚔️ Héros & créatures
-          </h2>
-
-
-          <form
-            className="admin-form"
-            onSubmit={submitHero}
-          >
-
-            <h3>
-              {editingType === "hero"
-                ? "✏️ Modifier un héros / une créature"
-                : "➕ Ajouter un héros / une créature"}
-            </h3>
-
-
-            <label>
-              Nom
-            </label>
-
-            <input
-              type="text"
-              value={heroForm.nom}
-              onChange={(event) =>
-                setHeroForm({
-                  ...heroForm,
-                  nom: event.target.value,
-                })
-              }
-              placeholder="Ex : Huitzilopochtli"
-              required
-            />
-
-
-            <label>
-              Type
-            </label>
-
-            <select
-              value={heroForm.type}
-              onChange={(event) =>
-                setHeroForm({
-                  ...heroForm,
-                  type: event.target.value,
-                })
-              }
-              required
-            >
-
-              <option value="héros">
-                Héros
-              </option>
-
-              <option value="créature">
-                Créature
-              </option>
-
-            </select>
-
-
-            <label>
-              Description
-            </label>
-
-            <textarea
-              value={heroForm.description}
-              onChange={(event) =>
-                setHeroForm({
-                  ...heroForm,
-                  description:
-                    event.target.value,
-                })
-              }
-              placeholder="Description..."
-              rows="5"
-            />
-
-
-            <label>
-              Image
-            </label>
-
-            <input
-              type="text"
-              value={heroForm.image}
-              onChange={(event) =>
-                setHeroForm({
-                  ...heroForm,
-                  image: event.target.value,
-                })
-              }
-              placeholder="URL de l'image"
-            />
-
-
-            <label>
-              Civilisation
-            </label>
-
-            <select
-              value={heroForm.civilisation_id}
-              onChange={(event) =>
-                setHeroForm({
-                  ...heroForm,
-                  civilisation_id:
-                    event.target.value,
-                })
-              }
-              required
-            >
-
-              <option value="">
-                Sélectionner une civilisation
-              </option>
-
-              {civilisations.map(
-                (civilisation) => (
-                  <option
-                    key={civilisation.id}
-                    value={civilisation.id}
-                  >
-                    {civilisation.nom}
-                  </option>
-                )
-              )}
-
-            </select>
-
-
-            <div className="form-actions">
-
-              <button
-                type="submit"
-                className="save-button"
-              >
-                {editingType === "hero"
-                  ? "💾 Modifier"
-                  : "➕ Ajouter"}
-              </button>
-
-              {editingType === "hero" && (
-                <button
-                  type="button"
-                  className="cancel-button"
-                  onClick={resetHeroForm}
-                >
-                  Annuler
-                </button>
-              )}
+              </form>
 
             </div>
 
-          </form>
+            <div className="content-list">
 
-
-          <div className="admin-content-list">
-
-            {heros.map((hero) => (
-              <article
-                className="content-card"
-                key={hero.id}
-              >
-
-                <div>
-
-                  <span className="content-id">
-                    #{hero.id}
-                  </span>
-
-                  <h3>
-                    {hero.nom}
-                  </h3>
-
-                  <p className="content-type">
-                    {hero.type}
-                  </p>
-
-                  <p className="content-civilisation">
-                    {hero.civilisation}
-                  </p>
-
-                  <p>
-                    {hero.description ||
-                      "Aucune description."}
-                  </p>
-
-                </div>
-
-                <div className="content-actions">
-
-                  <button
-                    className="edit-button"
-                    onClick={() =>
-                      editHero(hero)
-                    }
-                  >
-                    ✏️ Modifier
-                  </button>
-
-                  <button
-                    className="delete-button"
-                    onClick={() =>
-                      deleteHero(hero.id)
-                    }
-                  >
-                    🗑️ Supprimer
-                  </button>
-
-                </div>
-
-              </article>
-            ))}
-
-          </div>
-
-        </section>
-      )}
-
-
-      {/* ========================================================
-          MYTHES
-          ======================================================== */}
-
-      {activeSection === "mythes" && (
-        <section className="admin-section">
-
-          <h2>
-            📜 Mythes & légendes
-          </h2>
-
-
-          <form
-            className="admin-form"
-            onSubmit={submitMythe}
-          >
-
-            <h3>
-              {editingType === "mythe"
-                ? "✏️ Modifier un mythe / une légende"
-                : "➕ Ajouter un mythe / une légende"}
-            </h3>
-
-
-            <label>
-              Titre
-            </label>
-
-            <input
-              type="text"
-              value={mytheForm.titre}
-              onChange={(event) =>
-                setMytheForm({
-                  ...mytheForm,
-                  titre: event.target.value,
-                })
-              }
-              placeholder="Ex : La naissance du Soleil"
-              required
-            />
-
-
-            <label>
-              Description
-            </label>
-
-            <textarea
-              value={mytheForm.description}
-              onChange={(event) =>
-                setMytheForm({
-                  ...mytheForm,
-                  description:
-                    event.target.value,
-                })
-              }
-              placeholder="Description..."
-              rows="6"
-            />
-
-
-            <label>
-              Image
-            </label>
-
-            <input
-              type="text"
-              value={mytheForm.image}
-              onChange={(event) =>
-                setMytheForm({
-                  ...mytheForm,
-                  image: event.target.value,
-                })
-              }
-              placeholder="URL de l'image"
-            />
-
-
-            <label>
-              Civilisation
-            </label>
-
-            <select
-              value={mytheForm.civilisation_id}
-              onChange={(event) =>
-                setMytheForm({
-                  ...mytheForm,
-                  civilisation_id:
-                    event.target.value,
-                })
-              }
-              required
-            >
-
-              <option value="">
-                Sélectionner une civilisation
-              </option>
-
-              {civilisations.map(
-                (civilisation) => (
-                  <option
-                    key={civilisation.id}
-                    value={civilisation.id}
-                  >
-                    {civilisation.nom}
-                  </option>
-                )
-              )}
-
-            </select>
-
-
-            <div className="form-actions">
-
-              <button
-                type="submit"
-                className="save-button"
-              >
-                {editingType === "mythe"
-                  ? "💾 Modifier"
-                  : "➕ Ajouter"}
-              </button>
-
-              {editingType === "mythe" && (
-                <button
-                  type="button"
-                  className="cancel-button"
-                  onClick={resetMytheForm}
+              {heros.map((hero) => (
+                <article
+                  className="admin-content-card"
+                  key={hero.id}
                 >
-                  Annuler
-                </button>
-              )}
+
+                  {hero.image ? (
+                    <img
+                      src={hero.image}
+                      alt={hero.nom}
+                    />
+                  ) : (
+                    <div className="admin-card-no-image">
+                      {hero.type === "héros"
+                        ? "⚔️"
+                        : "🐉"}
+                    </div>
+                  )}
+
+                  <div className="admin-card-info">
+
+                    <span className="content-tag">
+                      {hero.type === "héros"
+                        ? "⚔️ Héros"
+                        : "🐉 Créature"}
+                    </span>
+
+                    <h3>{hero.nom}</h3>
+
+                    <p>
+                      {hero.description}
+                    </p>
+
+                    <p className="content-civilisation">
+                      {hero.civilisation_nom ||
+                        "Civilisation"}
+                    </p>
+
+                    <div className="card-actions">
+
+                      <button
+                        className="edit-button"
+                        onClick={() =>
+                          editHero(hero)
+                        }
+                      >
+                        ✏️ Modifier
+                      </button>
+
+                      <button
+                        className="delete-button"
+                        onClick={() =>
+                          deleteHero(hero.id)
+                        }
+                      >
+                        🗑️ Supprimer
+                      </button>
+
+                    </div>
+
+                  </div>
+
+                </article>
+              ))}
 
             </div>
 
-          </form>
+          </section>
+        )}
 
+        {/* ======================================================
+            MYTHES
+            ====================================================== */}
 
-          <div className="admin-content-list">
+        {activeSection === "mythes" && (
+          <section>
 
-            {mythes.map((mythe) => (
-              <article
-                className="content-card"
-                key={mythe.id}
+            <div className="admin-section-header">
+              <h2>📜 Mythes & légendes</h2>
+
+              <p>
+                Ajouter, modifier ou supprimer
+                des mythes et légendes.
+              </p>
+            </div>
+
+            <div className="admin-form-card">
+
+              <h3>
+                {editingMythe
+                  ? "✏️ Modifier le mythe"
+                  : "➕ Ajouter un mythe"}
+              </h3>
+
+              <form
+                onSubmit={
+                  editingMythe
+                    ? updateMythe
+                    : addMythe
+                }
               >
 
-                <div>
+                <div className="form-group">
+                  <label>Titre</label>
 
-                  <span className="content-id">
-                    #{mythe.id}
-                  </span>
+                  <input
+                    type="text"
+                    name="titre"
+                    value={mytheData.titre}
+                    onChange={handleMytheChange}
+                    placeholder="Ex : La naissance du Soleil"
+                    required
+                  />
+                </div>
 
-                  <h3>
-                    {mythe.titre}
-                  </h3>
+                <div className="form-group">
+                  <label>Civilisation</label>
 
-                  <p className="content-civilisation">
-                    {mythe.civilisation}
-                  </p>
+                  <select
+                    name="civilisation_id"
+                    value={
+                      mytheData.civilisation_id
+                    }
+                    onChange={handleMytheChange}
+                    required
+                  >
+                    <option value="">
+                      Choisir une civilisation
+                    </option>
 
-                  <p>
-                    {mythe.description ||
-                      "Aucune description."}
-                  </p>
+                    {civilisations.map(
+                      (civilisation) => (
+                        <option
+                          key={civilisation.id}
+                          value={civilisation.id}
+                        >
+                          {civilisation.nom}
+                        </option>
+                      )
+                    )}
+                  </select>
+                </div>
+
+                <div className="form-group">
+                  <label>URL de l'image</label>
+
+                  <input
+                    type="text"
+                    name="image"
+                    value={mytheData.image}
+                    onChange={handleMytheChange}
+                    placeholder="https://..."
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>Description</label>
+
+                  <textarea
+                    name="description"
+                    value={mytheData.description}
+                    onChange={handleMytheChange}
+                    placeholder="Description du mythe..."
+                    rows="6"
+                    required
+                  />
+                </div>
+
+                <div className="form-actions">
+
+                  <button
+                    type="submit"
+                    className="save-button"
+                  >
+                    {editingMythe
+                      ? "💾 Enregistrer"
+                      : "➕ Ajouter"}
+                  </button>
+
+                  {editingMythe && (
+                    <button
+                      type="button"
+                      className="cancel-button"
+                      onClick={cancelEdit}
+                    >
+                      Annuler
+                    </button>
+                  )}
 
                 </div>
 
-                <div className="content-actions">
+              </form>
 
-                  <button
-                    className="edit-button"
-                    onClick={() =>
-                      editMythe(mythe)
-                    }
-                  >
-                    ✏️ Modifier
-                  </button>
+            </div>
 
-                  <button
-                    className="delete-button"
-                    onClick={() =>
-                      deleteMythe(mythe.id)
-                    }
-                  >
-                    🗑️ Supprimer
-                  </button>
+            <div className="content-list">
 
-                </div>
+              {mythes.map((mythe) => (
+                <article
+                  className="admin-content-card"
+                  key={mythe.id}
+                >
 
-              </article>
-            ))}
+                  {mythe.image ? (
+                    <img
+                      src={mythe.image}
+                      alt={mythe.titre}
+                    />
+                  ) : (
+                    <div className="admin-card-no-image">
+                      📜
+                    </div>
+                  )}
 
-          </div>
+                  <div className="admin-card-info">
 
-        </section>
-      )}
+                    <span className="content-tag">
+                      📜 Mythe & légende
+                    </span>
+
+                    <h3>{mythe.titre}</h3>
+
+                    <p>
+                      {mythe.description}
+                    </p>
+
+                    <p className="content-civilisation">
+                      {mythe.civilisation_nom ||
+                        "Civilisation"}
+                    </p>
+
+                    <div className="card-actions">
+
+                      <button
+                        className="edit-button"
+                        onClick={() =>
+                          editMythe(mythe)
+                        }
+                      >
+                        ✏️ Modifier
+                      </button>
+
+                      <button
+                        className="delete-button"
+                        onClick={() =>
+                          deleteMythe(mythe.id)
+                        }
+                      >
+                        🗑️ Supprimer
+                      </button>
+
+                    </div>
+
+                  </div>
+
+                </article>
+              ))}
+
+            </div>
+
+          </section>
+        )}
+
+      </section>
 
     </main>
   );

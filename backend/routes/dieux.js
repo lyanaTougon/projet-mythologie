@@ -1,4 +1,5 @@
 const express = require("express");
+const router = express.Router();
 
 const pool = require("../db");
 
@@ -7,36 +8,77 @@ const {
   requireAdmin,
 } = require("../middleware/auth");
 
-const router = express.Router();
-
 /* ============================================================
-   GET - TOUS LES DIEUX ET DÉESSES
+   GET - TOUS LES DIEUX / DÉESSES
    ============================================================ */
 
 router.get("/", async (req, res) => {
   try {
-    const result = await pool.query(`
+    const {
+      civilisation,
+      search,
+    } = req.query;
+
+    let query = `
       SELECT
-        dieux.id,
-        dieux.nom,
-        dieux.description,
-        dieux.image,
-        dieux.created_at,
-        civilisations.id AS civilisation_id,
-        civilisations.nom AS civilisation,
-        civilisations.slug AS civilisation_slug
-      FROM dieux
-      INNER JOIN civilisations
-        ON dieux.civilisation_id = civilisations.id
-      ORDER BY dieux.id ASC
-    `);
+        d.id,
+        d.nom,
+        d.description,
+        d.image,
+        d.civilisation_id,
+        c.nom AS civilisation_nom,
+        c.slug AS civilisation_slug
+      FROM dieux d
+      INNER JOIN civilisations c
+        ON d.civilisation_id = c.id
+    `;
+
+    const conditions = [];
+    const values = [];
+
+    if (civilisation) {
+      values.push(civilisation);
+
+      conditions.push(
+        `c.slug = $${values.length}`
+      );
+    }
+
+    if (search) {
+      values.push(`%${search}%`);
+
+      conditions.push(`
+        (
+          d.nom ILIKE $${values.length}
+          OR d.description ILIKE $${values.length}
+        )
+      `);
+    }
+
+    if (conditions.length > 0) {
+      query += `
+        WHERE ${conditions.join(" AND ")}
+      `;
+    }
+
+    query += `
+      ORDER BY d.id ASC
+    `;
+
+    const result = await pool.query(
+      query,
+      values
+    );
 
     res.json({
       dieux: result.rows,
     });
 
   } catch (error) {
-    console.error("Erreur récupération dieux :", error);
+    console.error(
+      "Erreur récupération dieux :",
+      error
+    );
 
     res.status(500).json({
       message: "Erreur serveur.",
@@ -46,39 +88,46 @@ router.get("/", async (req, res) => {
 
 
 /* ============================================================
-   GET - DIEUX D'UNE CIVILISATION
+   GET - UN DIEU / UNE DÉESSE PAR ID
    ============================================================ */
 
-router.get("/civilisation/:slug", async (req, res) => {
+router.get("/:id", async (req, res) => {
   try {
-    const { slug } = req.params;
+    const { id } = req.params;
 
     const result = await pool.query(
       `
       SELECT
-        dieux.id,
-        dieux.nom,
-        dieux.description,
-        dieux.image,
-        dieux.created_at,
-        civilisations.id AS civilisation_id,
-        civilisations.nom AS civilisation,
-        civilisations.slug AS civilisation_slug
-      FROM dieux
-      INNER JOIN civilisations
-        ON dieux.civilisation_id = civilisations.id
-      WHERE civilisations.slug = $1
-      ORDER BY dieux.id ASC
+        d.id,
+        d.nom,
+        d.description,
+        d.image,
+        d.civilisation_id,
+        c.nom AS civilisation_nom,
+        c.slug AS civilisation_slug
+      FROM dieux d
+      INNER JOIN civilisations c
+        ON d.civilisation_id = c.id
+      WHERE d.id = $1
       `,
-      [slug]
+      [id]
     );
 
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        message: "Dieu ou déesse introuvable.",
+      });
+    }
+
     res.json({
-      dieux: result.rows,
+      dieu: result.rows[0],
     });
 
   } catch (error) {
-    console.error("Erreur récupération dieux :", error);
+    console.error(
+      "Erreur récupération dieu :",
+      error
+    );
 
     res.status(500).json({
       message: "Erreur serveur.",
@@ -89,6 +138,7 @@ router.get("/civilisation/:slug", async (req, res) => {
 
 /* ============================================================
    POST - AJOUTER UN DIEU / UNE DÉESSE
+   ADMIN UNIQUEMENT
    ============================================================ */
 
 router.post(
@@ -106,18 +156,8 @@ router.post(
 
       if (!nom || !civilisation_id) {
         return res.status(400).json({
-          message: "Le nom et la civilisation sont obligatoires.",
-        });
-      }
-
-      const civilisation = await pool.query(
-        "SELECT id FROM civilisations WHERE id = $1",
-        [civilisation_id]
-      );
-
-      if (civilisation.rows.length === 0) {
-        return res.status(404).json({
-          message: "Civilisation introuvable.",
+          message:
+            "Le nom et la civilisation sont obligatoires.",
         });
       }
 
@@ -131,13 +171,7 @@ router.post(
           civilisation_id
         )
         VALUES ($1, $2, $3, $4)
-        RETURNING
-          id,
-          nom,
-          description,
-          image,
-          civilisation_id,
-          created_at
+        RETURNING *
         `,
         [
           nom,
@@ -153,7 +187,10 @@ router.post(
       });
 
     } catch (error) {
-      console.error("Erreur ajout dieu :", error);
+      console.error(
+        "Erreur ajout dieu :",
+        error
+      );
 
       res.status(500).json({
         message: "Erreur serveur.",
@@ -165,6 +202,7 @@ router.post(
 
 /* ============================================================
    PUT - MODIFIER UN DIEU / UNE DÉESSE
+   ADMIN UNIQUEMENT
    ============================================================ */
 
 router.put(
@@ -173,7 +211,7 @@ router.put(
   requireAdmin,
   async (req, res) => {
     try {
-      const id = Number(req.params.id);
+      const { id } = req.params;
 
       const {
         nom,
@@ -182,26 +220,10 @@ router.put(
         civilisation_id,
       } = req.body;
 
-      if (!Number.isInteger(id)) {
-        return res.status(400).json({
-          message: "ID invalide.",
-        });
-      }
-
       if (!nom || !civilisation_id) {
         return res.status(400).json({
-          message: "Le nom et la civilisation sont obligatoires.",
-        });
-      }
-
-      const civilisation = await pool.query(
-        "SELECT id FROM civilisations WHERE id = $1",
-        [civilisation_id]
-      );
-
-      if (civilisation.rows.length === 0) {
-        return res.status(404).json({
-          message: "Civilisation introuvable.",
+          message:
+            "Le nom et la civilisation sont obligatoires.",
         });
       }
 
@@ -214,13 +236,7 @@ router.put(
           image = $3,
           civilisation_id = $4
         WHERE id = $5
-        RETURNING
-          id,
-          nom,
-          description,
-          image,
-          civilisation_id,
-          created_at
+        RETURNING *
         `,
         [
           nom,
@@ -238,12 +254,16 @@ router.put(
       }
 
       res.json({
-        message: "Dieu ou déesse modifié avec succès.",
+        message:
+          "Dieu ou déesse modifié avec succès.",
         dieu: result.rows[0],
       });
 
     } catch (error) {
-      console.error("Erreur modification dieu :", error);
+      console.error(
+        "Erreur modification dieu :",
+        error
+      );
 
       res.status(500).json({
         message: "Erreur serveur.",
@@ -255,6 +275,7 @@ router.put(
 
 /* ============================================================
    DELETE - SUPPRIMER UN DIEU / UNE DÉESSE
+   ADMIN UNIQUEMENT
    ============================================================ */
 
 router.delete(
@@ -263,19 +284,13 @@ router.delete(
   requireAdmin,
   async (req, res) => {
     try {
-      const id = Number(req.params.id);
-
-      if (!Number.isInteger(id)) {
-        return res.status(400).json({
-          message: "ID invalide.",
-        });
-      }
+      const { id } = req.params;
 
       const result = await pool.query(
         `
         DELETE FROM dieux
         WHERE id = $1
-        RETURNING id, nom
+        RETURNING *
         `,
         [id]
       );
@@ -287,12 +302,15 @@ router.delete(
       }
 
       res.json({
-        message: "Dieu ou déesse supprimé avec succès.",
-        dieu: result.rows[0],
+        message:
+          "Dieu ou déesse supprimé avec succès.",
       });
 
     } catch (error) {
-      console.error("Erreur suppression dieu :", error);
+      console.error(
+        "Erreur suppression dieu :",
+        error
+      );
 
       res.status(500).json({
         message: "Erreur serveur.",

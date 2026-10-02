@@ -483,6 +483,67 @@ button {
   font-family: inherit;
 }
 
+/* =========================================================
+   CARTES DE L'ACCUEIL
+   ========================================================= */
+
+.home-content-card,
+.home-mythe-card {
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+
+/* =========================================================
+   LIEN "DÉCOUVRIR"
+   ========================================================= */
+
+.home-card-link {
+  display: inline-block;
+
+  margin-top: 1rem;
+
+  color: #d4af37;
+
+  font-size: 0.9rem;
+  font-weight: 600;
+
+  transition:
+    color 0.3s ease,
+    transform 0.3s ease;
+}
+
+
+/* =========================================================
+   HOVER "DÉCOUVRIR"
+   ========================================================= */
+
+.home-content-card:hover .home-card-link,
+.home-mythe-card:hover .home-card-link {
+  color: #f0d878;
+
+  transform: translateX(4px);
+}
+
+
+/* =========================================================
+   HOVER CARTES ACCUEIL
+   ========================================================= */
+
+.home-content-card,
+.home-mythe-card {
+  transition:
+    transform 0.3s ease,
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.home-content-card:hover,
+.home-mythe-card:hover {
+  transform: translateY(-5px);
+}
+
 
 /* =========================================================
    RESPONSIVE — TABLETTE

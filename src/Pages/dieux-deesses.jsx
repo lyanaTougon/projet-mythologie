@@ -1,38 +1,129 @@
 import { useEffect, useState } from "react";
+import {
+  Link,
+  useSearchParams,
+} from "react-router-dom";
+
+import "./dieux-deesses.css";
 
 const API_URL = "http://localhost:5000";
 
 function DieuxDeesses() {
+  const [searchParams, setSearchParams] =
+    useSearchParams();
+
+  const civilisationInitiale =
+    searchParams.get("civilisation") || "";
+
   const [dieux, setDieux] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [civilisations, setCivilisations] =
+    useState([]);
+
+  const [search, setSearch] =
+    useState("");
+
+  const [civilisation, setCivilisation] =
+    useState(civilisationInitiale);
+
+  const [loading, setLoading] =
+    useState(true);
+
+  const [error, setError] =
+    useState("");
+
+  /*
+   * ============================================================
+   * CHARGER LES CIVILISATIONS
+   * ============================================================
+   */
 
   useEffect(() => {
-    const fetchDieux = async () => {
+    const chargerCivilisations = async () => {
       try {
         const response = await fetch(
-          `${API_URL}/api/dieux`
+          `${API_URL}/api/civilisations`
         );
 
         const data = await response.json();
 
         if (!response.ok) {
           throw new Error(
-            data.message ||
-            "Impossible de récupérer les dieux."
+            "Impossible de charger les civilisations."
           );
         }
 
-        setDieux(data.dieux || []);
+        setCivilisations(
+          data.civilisations || data
+        );
 
       } catch (error) {
         console.error(
-          "Erreur récupération dieux :",
+          "Erreur civilisations :",
+          error
+        );
+      }
+    };
+
+    chargerCivilisations();
+  }, []);
+
+
+  /*
+   * ============================================================
+   * CHARGER LES DIEUX
+   * ============================================================
+   */
+
+  useEffect(() => {
+    const chargerDieux = async () => {
+      try {
+        setLoading(true);
+        setError("");
+
+        const params =
+          new URLSearchParams();
+
+        if (search.trim()) {
+          params.set(
+            "search",
+            search.trim()
+          );
+        }
+
+        if (civilisation) {
+          params.set(
+            "civilisation",
+            civilisation
+          );
+        }
+
+        const response = await fetch(
+          `${API_URL}/api/dieux?${params.toString()}`
+        );
+
+        const data =
+          await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            data.message ||
+              "Impossible de charger les dieux."
+          );
+        }
+
+        setDieux(
+          data.dieux || data
+        );
+
+      } catch (error) {
+        console.error(
+          "Erreur dieux :",
           error
         );
 
         setError(
-          "Impossible de charger les dieux et déesses."
+          error.message ||
+            "Une erreur est survenue."
         );
 
       } finally {
@@ -40,68 +131,263 @@ function DieuxDeesses() {
       }
     };
 
-    fetchDieux();
-  }, []);
+    chargerDieux();
+
+  }, [search, civilisation]);
+
+
+  /*
+   * ============================================================
+   * CHANGER DE CIVILISATION
+   * ============================================================
+   */
+
+  const changerCivilisation = (
+    value
+  ) => {
+    setCivilisation(value);
+
+    if (value) {
+      setSearchParams({
+        civilisation: value,
+      });
+    } else {
+      setSearchParams({});
+    }
+  };
+
+
+  /*
+   * ============================================================
+   * AFFICHAGE
+   * ============================================================
+   */
 
   return (
-    <main className="page">
+    <main className="catalogue-page">
 
-      <h1>Dieux & déesses</h1>
+      {/* ======================================================
+          EN-TÊTE
+      ======================================================= */}
 
-      <p>
-        Découvrez les divinités des différentes
-        mythologies.
-      </p>
+      <section className="catalogue-header">
 
-      {loading && (
-        <p>Chargement...</p>
-      )}
-
-      {error && (
-        <p>{error}</p>
-      )}
-
-      {!loading && !error && dieux.length === 0 && (
-        <p>
-          Aucun dieu ou déesse n'a encore été ajouté.
+        <p className="catalogue-label">
+          DIVINITÉS
         </p>
-      )}
 
-      <div className="cards">
+        <h1>
+          Dieux & déesses
+        </h1>
 
-        {dieux.map((dieu) => (
-          <article
-            key={dieu.id}
-            className="card"
+        <p>
+          Découvrez les divinités des différentes
+          civilisations mythologiques.
+        </p>
+
+      </section>
+
+
+      {/* ======================================================
+          FILTRES
+      ======================================================= */}
+
+      <section className="catalogue-filters">
+
+        <div className="search-box">
+
+          <span>
+            🔍
+          </span>
+
+          <input
+            type="text"
+            placeholder="Rechercher un dieu ou une déesse..."
+            value={search}
+            onChange={(event) =>
+              setSearch(
+                event.target.value
+              )
+            }
+          />
+
+        </div>
+
+
+        <div className="filter-box">
+
+          <label>
+            Civilisation
+          </label>
+
+          <select
+            value={civilisation}
+            onChange={(event) =>
+              changerCivilisation(
+                event.target.value
+              )
+            }
           >
 
-            {dieu.image && (
-              <img
-                src={dieu.image}
-                alt={dieu.nom}
-              />
+            <option value="">
+              Toutes les civilisations
+            </option>
+
+            {civilisations.map(
+              (item) => (
+                <option
+                  key={item.id}
+                  value={item.slug}
+                >
+                  {item.nom}
+                </option>
+              )
             )}
 
-            <h3>
-              {dieu.nom}
-            </h3>
+          </select>
 
-            <p>
-              {dieu.description}
+        </div>
+
+      </section>
+
+
+      {/* ======================================================
+          RÉSULTATS
+      ======================================================= */}
+
+      <section className="catalogue-results">
+
+        <div className="catalogue-results-header">
+
+          <div>
+
+            <p className="catalogue-label">
+              COLLECTION
             </p>
 
-            {dieu.civilisation_nom && (
-              <p>
-                <strong>
-                  {dieu.civilisation_nom}
-                </strong>
-              </p>
-            )}
+            <h2>
+              {civilisation
+                ? civilisations.find(
+                    (item) =>
+                      item.slug ===
+                      civilisation
+                  )?.nom ||
+                  "Divinités"
+                : "Toutes les divinités"}
+            </h2>
 
-          </article>
-        ))}
+          </div>
 
-      </div>
+
+          <span className="results-count">
+
+            {dieux.length} résultat
+            {dieux.length > 1
+              ? "s"
+              : ""}
+
+          </span>
+
+        </div>
+
+
+        {/* ====================================================
+            CHARGEMENT
+        ===================================================== */}
+
+        {loading ? (
+
+          <div className="catalogue-message">
+            Chargement des divinités...
+          </div>
+
+
+        ) : error ? (
+
+          <div className="catalogue-message">
+            {error}
+          </div>
+
+
+        ) : dieux.length === 0 ? (
+
+          <div className="catalogue-message">
+            Aucune divinité trouvée.
+          </div>
+
+
+        ) : (
+
+          <div className="catalogue-grid">
+
+            {dieux.map((dieu) => (
+
+              <article
+                key={dieu.id}
+                className="catalogue-card"
+              >
+
+                {/* IMAGE */}
+
+                {dieu.image ? (
+
+                  <img
+                    src={dieu.image}
+                    alt={dieu.nom}
+                  />
+
+                ) : (
+
+                  <div className="catalogue-placeholder">
+                    ⚜
+                  </div>
+
+                )}
+
+
+                {/* CONTENU */}
+
+                <div className="catalogue-card-body">
+
+                  <span className="catalogue-card-category">
+
+                    {dieu.civilisation_nom ||
+                      "Mythologie"}
+
+                  </span>
+
+
+                  <h3>
+                    {dieu.nom}
+                  </h3>
+
+
+                  <p>
+                    {dieu.description ||
+                      "Découvrez cette divinité mythologique."}
+                  </p>
+
+
+                  {/* BOUTON DÉCOUVRIR */}
+
+                  <Link
+                    to={`/dieux-deesses/${dieu.id}`}
+                    className="catalogue-card-button"
+                  >
+                    Découvrir →
+                  </Link>
+
+                </div>
+
+              </article>
+
+            ))}
+
+          </div>
+
+        )}
+
+      </section>
 
     </main>
   );
