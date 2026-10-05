@@ -1,0 +1,102 @@
+.compte-page {
+  min-height: calc(100vh - 80px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 20px;
+  box-sizing: border-box;
+}
+
+.compte-card {
+  width: 100%;
+  max-width: 550px;
+  background: #2b2b2b;
+  border: 1px solid #d4af37;
+  border-radius: 15px;
+  padding: 40px;
+  box-sizing: border-box;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+
+.compte-icon {
+  font-size: 55px;
+  margin-bottom: 10px;
+}
+
+.compte-card h1 {
+  color: #d4af37;
+  margin-bottom: 10px;
+}
+
+.compte-subtitle {
+  color: #ddd;
+  margin-bottom: 30px;
+}
+
+.compte-informations {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+.compte-info {
+  background: #222;
+  border-radius: 10px;
+  padding: 15px 18px;
+  text-align: left;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  gap: 20px;
+}
+
+.compte-info span {
+  color: #ccc;
+}
+
+.compte-info strong {
+  color: #f0d878;
+  text-align: right;
+  word-break: break-word;
+}
+
+.compte-admin-button,
+.compte-logout-button {
+  width: 100%;
+  padding: 13px;
+
+  border-radius: 8px;
+
+  font-size: 16px;
+  font-weight: bold;
+
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.compte-admin-button {
+  background: #d4af37;
+  color: #222;
+  border: none;
+
+  margin-bottom: 12px;
+}
+
+.compte-admin-button:hover {
+  background: #f0d878;
+}
+
+.compte-logout-button {
+  background: transparent;
+  color: #d4af37;
+  border: 1px solid #d4af37;
+}
+
+.compte-logout-button:hover {
+  background: #d4af37;
+  color: #222;
+}

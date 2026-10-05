@@ -4,6 +4,184 @@ import "./admin.css";
 
 const API_URL = "http://localhost:5000";
 
+const emptyDieu = {
+  nom: "",
+  description: "",
+  image: "",
+  image2: "",
+  image3: "",
+  civilisation_id: "",
+};
+
+const emptyHero = {
+  nom: "",
+  type: "héros",
+  description: "",
+  image: "",
+  image2: "",
+  image3: "",
+  civilisation_id: "",
+};
+
+const emptyMythe = {
+  titre: "",
+  description: "",
+  image: "",
+  image2: "",
+  image3: "",
+  civilisation_id: "",
+};
+
+
+/* ============================================================
+   COMPOSANT POUR CHOISIR UNE IMAGE
+   ============================================================ */
+
+function ImagePicker({ label, value, onChange }) {
+  const [error, setError] = useState("");
+
+  const handleFileChange = (event) => {
+    const file = event.target.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    setError("");
+
+    // Vérification du type
+    if (!file.type.startsWith("image/")) {
+      setError("Veuillez sélectionner une image.");
+      return;
+    }
+
+    // Limite de 2,5 Mo
+    if (file.size > 2.5 * 1024 * 1024) {
+      setError("L'image doit faire moins de 2,5 Mo.");
+      return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      onChange(reader.result);
+    };
+
+    reader.onerror = () => {
+      setError("Impossible de lire cette image.");
+    };
+
+    reader.readAsDataURL(file);
+  };
+
+  const removeImage = () => {
+    onChange("");
+    setError("");
+  };
+
+  return (
+    <div className="image-picker">
+
+      <label className="image-picker-label">
+        {label}
+      </label>
+
+      <label className="file-input-button">
+        📁 Choisir une image
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handleFileChange}
+        />
+      </label>
+
+      {value ? (
+        <div className="image-preview-container">
+
+          <img
+            src={value}
+            alt={`Aperçu ${label}`}
+            className="image-preview"
+          />
+
+          <button
+            type="button"
+            className="remove-image-button"
+            onClick={removeImage}
+          >
+            🗑️ Retirer cette image
+          </button>
+
+        </div>
+      ) : (
+        <div className="image-preview-empty">
+          <span>🖼️</span>
+          <p>Aucune image sélectionnée</p>
+        </div>
+      )}
+
+      {error && (
+        <p className="image-error">
+          ❌ {error}
+        </p>
+      )}
+
+    </div>
+  );
+}
+
+
+/* ============================================================
+   APERÇU DES IMAGES D'UNE CARTE
+   ============================================================ */
+
+function CardImages({ item, fallback }) {
+  const images = [
+    item.image,
+    item.image2,
+    item.image3,
+  ].filter(Boolean);
+
+  if (images.length === 0) {
+    return (
+      <div className="admin-card-no-image">
+        {fallback}
+      </div>
+    );
+  }
+
+  return (
+    <div className="admin-card-images">
+
+      <img
+        src={images[0]}
+        alt=""
+        className="admin-card-main-image"
+      />
+
+      {images.length > 1 && (
+        <div className="admin-card-thumbnails">
+
+          {images.map((image, index) => (
+            <img
+              key={`${image}-${index}`}
+              src={image}
+              alt={`Image ${index + 1}`}
+            />
+          ))}
+
+        </div>
+      )}
+
+    </div>
+  );
+}
+
+
+/* ============================================================
+   ADMIN
+   ============================================================ */
+
 function Admin() {
   const navigate = useNavigate();
 
@@ -26,27 +204,9 @@ function Admin() {
   const [mythes, setMythes] = useState([]);
   const [civilisations, setCivilisations] = useState([]);
 
-  const [dieuData, setDieuData] = useState({
-    nom: "",
-    description: "",
-    image: "",
-    civilisation_id: "",
-  });
-
-  const [heroData, setHeroData] = useState({
-    nom: "",
-    type: "héros",
-    description: "",
-    image: "",
-    civilisation_id: "",
-  });
-
-  const [mytheData, setMytheData] = useState({
-    titre: "",
-    description: "",
-    image: "",
-    civilisation_id: "",
-  });
+  const [dieuData, setDieuData] = useState(emptyDieu);
+  const [heroData, setHeroData] = useState(emptyHero);
+  const [mytheData, setMytheData] = useState(emptyMythe);
 
   const [editingDieu, setEditingDieu] = useState(null);
   const [editingHero, setEditingHero] = useState(null);
@@ -55,6 +215,7 @@ function Admin() {
   const getToken = () => {
     return localStorage.getItem("token");
   };
+
 
   /* ============================================================
      MESSAGES
@@ -78,8 +239,9 @@ function Admin() {
     }, 4000);
   };
 
+
   /* ============================================================
-     VERIFICATION ADMIN
+     VÉRIFICATION ADMIN
      ============================================================ */
 
   useEffect(() => {
@@ -100,6 +262,7 @@ function Admin() {
       }
 
       setUser(parsedUser);
+
     } catch (err) {
       console.error(err);
 
@@ -110,8 +273,9 @@ function Admin() {
     }
   }, [navigate]);
 
+
   /* ============================================================
-     CHARGEMENT
+     CHARGEMENT DES DONNÉES
      ============================================================ */
 
   useEffect(() => {
@@ -121,6 +285,7 @@ function Admin() {
 
     loadData();
   }, [user]);
+
 
   const loadData = async () => {
     await Promise.all([
@@ -132,6 +297,7 @@ function Admin() {
       loadCivilisations(),
     ]);
   };
+
 
   /* ============================================================
      STATISTIQUES
@@ -158,10 +324,12 @@ function Admin() {
         ...current,
         totalUsers: data.totalUsers || 0,
       }));
+
     } catch (err) {
       console.error("Erreur statistiques :", err);
     }
   };
+
 
   /* ============================================================
      UTILISATEURS
@@ -185,10 +353,12 @@ function Admin() {
       }
 
       setUsers(data.users || []);
+
     } catch (err) {
       console.error("Erreur utilisateurs :", err);
     }
   };
+
 
   /* ============================================================
      DIEUX
@@ -214,10 +384,12 @@ function Admin() {
         ...current,
         totalDieux: list.length,
       }));
+
     } catch (err) {
       console.error("Erreur dieux :", err);
     }
   };
+
 
   /* ============================================================
      HEROS
@@ -243,10 +415,12 @@ function Admin() {
         ...current,
         totalHeros: list.length,
       }));
+
     } catch (err) {
       console.error("Erreur héros :", err);
     }
   };
+
 
   /* ============================================================
      MYTHES
@@ -272,10 +446,12 @@ function Admin() {
         ...current,
         totalMythes: list.length,
       }));
+
     } catch (err) {
       console.error("Erreur mythes :", err);
     }
   };
+
 
   /* ============================================================
      CIVILISATIONS
@@ -296,6 +472,7 @@ function Admin() {
 
         return;
       }
+
     } catch (err) {
       console.log(
         "Route civilisations non disponible."
@@ -322,8 +499,9 @@ function Admin() {
     ]);
   };
 
+
   /* ============================================================
-     DECONNEXION
+     DÉCONNEXION
      ============================================================ */
 
   const logout = () => {
@@ -333,8 +511,9 @@ function Admin() {
     navigate("/connexion");
   };
 
+
   /* ============================================================
-     UTILISATEURS - SUPPRESSION
+     UTILISATEUR - SUPPRESSION
      ============================================================ */
 
   const deleteUser = async (id) => {
@@ -379,13 +558,15 @@ function Admin() {
 
       await loadUsers();
       await loadStats();
+
     } catch (err) {
       showError(err.message);
     }
   };
 
+
   /* ============================================================
-     DIEU - CHANGEMENT FORMULAIRE
+     DIEU - CHANGEMENT
      ============================================================ */
 
   const handleDieuChange = (event) => {
@@ -396,6 +577,7 @@ function Admin() {
       [name]: value,
     }));
   };
+
 
   /* ============================================================
      DIEU - AJOUT
@@ -417,6 +599,8 @@ function Admin() {
             nom: dieuData.nom,
             description: dieuData.description,
             image: dieuData.image,
+            image2: dieuData.image2,
+            image3: dieuData.image3,
             civilisation_id: Number(
               dieuData.civilisation_id
             ),
@@ -433,15 +617,18 @@ function Admin() {
         );
       }
 
-      showMessage("Dieu ajouté avec succès.");
+      showMessage(
+        "Dieu ajouté avec succès."
+      );
 
       resetDieu();
-
       await loadDieux();
+
     } catch (err) {
       showError(err.message);
     }
   };
+
 
   /* ============================================================
      DIEU - MODIFICATION
@@ -454,6 +641,8 @@ function Admin() {
       nom: dieu.nom || "",
       description: dieu.description || "",
       image: dieu.image || "",
+      image2: dieu.image2 || "",
+      image3: dieu.image3 || "",
       civilisation_id:
         dieu.civilisation_id || "",
     });
@@ -465,6 +654,7 @@ function Admin() {
       behavior: "smooth",
     });
   };
+
 
   const updateDieu = async (event) => {
     event.preventDefault();
@@ -486,6 +676,8 @@ function Admin() {
             nom: dieuData.nom,
             description: dieuData.description,
             image: dieuData.image,
+            image2: dieuData.image2,
+            image3: dieuData.image3,
             civilisation_id: Number(
               dieuData.civilisation_id
             ),
@@ -510,10 +702,12 @@ function Admin() {
       resetDieu();
 
       await loadDieux();
+
     } catch (err) {
       showError(err.message);
     }
   };
+
 
   /* ============================================================
      DIEU - SUPPRESSION
@@ -553,13 +747,15 @@ function Admin() {
       );
 
       await loadDieux();
+
     } catch (err) {
       showError(err.message);
     }
   };
 
+
   /* ============================================================
-     HEROS - CHANGEMENT FORMULAIRE
+     HEROS - CHANGEMENT
      ============================================================ */
 
   const handleHeroChange = (event) => {
@@ -570,6 +766,7 @@ function Admin() {
       [name]: value,
     }));
   };
+
 
   /* ============================================================
      HEROS - AJOUT
@@ -592,6 +789,8 @@ function Admin() {
             type: heroData.type,
             description: heroData.description,
             image: heroData.image,
+            image2: heroData.image2,
+            image3: heroData.image3,
             civilisation_id: Number(
               heroData.civilisation_id
             ),
@@ -613,12 +812,13 @@ function Admin() {
       );
 
       resetHero();
-
       await loadHeros();
+
     } catch (err) {
       showError(err.message);
     }
   };
+
 
   /* ============================================================
      HEROS - MODIFICATION
@@ -632,6 +832,8 @@ function Admin() {
       type: hero.type || "héros",
       description: hero.description || "",
       image: hero.image || "",
+      image2: hero.image2 || "",
+      image3: hero.image3 || "",
       civilisation_id:
         hero.civilisation_id || "",
     });
@@ -643,6 +845,7 @@ function Admin() {
       behavior: "smooth",
     });
   };
+
 
   const updateHero = async (event) => {
     event.preventDefault();
@@ -665,6 +868,8 @@ function Admin() {
             type: heroData.type,
             description: heroData.description,
             image: heroData.image,
+            image2: heroData.image2,
+            image3: heroData.image3,
             civilisation_id: Number(
               heroData.civilisation_id
             ),
@@ -689,10 +894,12 @@ function Admin() {
       resetHero();
 
       await loadHeros();
+
     } catch (err) {
       showError(err.message);
     }
   };
+
 
   /* ============================================================
      HEROS - SUPPRESSION
@@ -732,13 +939,15 @@ function Admin() {
       );
 
       await loadHeros();
+
     } catch (err) {
       showError(err.message);
     }
   };
 
+
   /* ============================================================
-     MYTHE - CHANGEMENT FORMULAIRE
+     MYTHE - CHANGEMENT
      ============================================================ */
 
   const handleMytheChange = (event) => {
@@ -749,6 +958,7 @@ function Admin() {
       [name]: value,
     }));
   };
+
 
   /* ============================================================
      MYTHE - AJOUT
@@ -770,6 +980,8 @@ function Admin() {
             titre: mytheData.titre,
             description: mytheData.description,
             image: mytheData.image,
+            image2: mytheData.image2,
+            image3: mytheData.image3,
             civilisation_id: Number(
               mytheData.civilisation_id
             ),
@@ -791,12 +1003,13 @@ function Admin() {
       );
 
       resetMythe();
-
       await loadMythes();
+
     } catch (err) {
       showError(err.message);
     }
   };
+
 
   /* ============================================================
      MYTHE - MODIFICATION
@@ -809,6 +1022,8 @@ function Admin() {
       titre: mythe.titre || "",
       description: mythe.description || "",
       image: mythe.image || "",
+      image2: mythe.image2 || "",
+      image3: mythe.image3 || "",
       civilisation_id:
         mythe.civilisation_id || "",
     });
@@ -820,6 +1035,7 @@ function Admin() {
       behavior: "smooth",
     });
   };
+
 
   const updateMythe = async (event) => {
     event.preventDefault();
@@ -841,6 +1057,8 @@ function Admin() {
             titre: mytheData.titre,
             description: mytheData.description,
             image: mytheData.image,
+            image2: mytheData.image2,
+            image3: mytheData.image3,
             civilisation_id: Number(
               mytheData.civilisation_id
             ),
@@ -865,10 +1083,12 @@ function Admin() {
       resetMythe();
 
       await loadMythes();
+
     } catch (err) {
       showError(err.message);
     }
   };
+
 
   /* ============================================================
      MYTHE - SUPPRESSION
@@ -908,42 +1128,35 @@ function Admin() {
       );
 
       await loadMythes();
+
     } catch (err) {
       showError(err.message);
     }
   };
 
+
   /* ============================================================
-     RESET FORMULAIRES
+     RESET
      ============================================================ */
 
   const resetDieu = () => {
     setDieuData({
-      nom: "",
-      description: "",
-      image: "",
-      civilisation_id: "",
+      ...emptyDieu,
     });
   };
 
   const resetHero = () => {
     setHeroData({
-      nom: "",
-      type: "héros",
-      description: "",
-      image: "",
-      civilisation_id: "",
+      ...emptyHero,
     });
   };
 
   const resetMythe = () => {
     setMytheData({
-      titre: "",
-      description: "",
-      image: "",
-      civilisation_id: "",
+      ...emptyMythe,
     });
   };
+
 
   const cancelEdit = () => {
     setEditingDieu(null);
@@ -955,6 +1168,7 @@ function Admin() {
     resetMythe();
   };
 
+
   /* ============================================================
      PROTECTION
      ============================================================ */
@@ -963,12 +1177,17 @@ function Admin() {
     return null;
   }
 
+
   /* ============================================================
      AFFICHAGE
      ============================================================ */
 
   return (
     <main className="admin-page">
+
+      {/* ======================================================
+          SIDEBAR
+          ====================================================== */}
 
       <aside className="admin-sidebar">
 
@@ -1082,6 +1301,11 @@ function Admin() {
 
       </aside>
 
+
+      {/* ======================================================
+          CONTENU
+          ====================================================== */}
+
       <section className="admin-content">
 
         <header className="admin-header">
@@ -1101,6 +1325,7 @@ function Admin() {
 
         </header>
 
+
         {message && (
           <div className="admin-message success">
             ✅ {message}
@@ -1113,6 +1338,7 @@ function Admin() {
           </div>
         )}
 
+
         {/* ======================================================
             DASHBOARD
             ====================================================== */}
@@ -1122,7 +1348,6 @@ function Admin() {
 
             <div className="admin-section-header">
               <h2>📊 Tableau de bord</h2>
-
               <p>
                 Vue générale du site.
               </p>
@@ -1184,6 +1409,7 @@ function Admin() {
 
             </div>
 
+
             <div className="dashboard-welcome">
 
               <div className="dashboard-welcome-icon">
@@ -1207,6 +1433,7 @@ function Admin() {
 
           </section>
         )}
+
 
         {/* ======================================================
             UTILISATEURS
@@ -1253,7 +1480,9 @@ function Admin() {
                     users.map((item) => (
                       <tr key={item.id}>
 
-                        <td>#{item.id}</td>
+                        <td>
+                          #{item.id}
+                        </td>
 
                         <td>
                           <strong>
@@ -1261,7 +1490,9 @@ function Admin() {
                           </strong>
                         </td>
 
-                        <td>{item.email}</td>
+                        <td>
+                          {item.email}
+                        </td>
 
                         <td>
                           <span
@@ -1318,6 +1549,7 @@ function Admin() {
           </section>
         )}
 
+
         {/* ======================================================
             DIEUX
             ====================================================== */}
@@ -1333,6 +1565,7 @@ function Admin() {
                 des divinités.
               </p>
             </div>
+
 
             <div className="admin-form-card">
 
@@ -1353,7 +1586,9 @@ function Admin() {
                 <div className="form-grid">
 
                   <div className="form-group">
-                    <label>Nom</label>
+                    <label>
+                      Nom
+                    </label>
 
                     <input
                       type="text"
@@ -1365,8 +1600,11 @@ function Admin() {
                     />
                   </div>
 
+
                   <div className="form-group">
-                    <label>Civilisation</label>
+                    <label>
+                      Civilisation
+                    </label>
 
                     <select
                       name="civilisation_id"
@@ -1390,35 +1628,83 @@ function Admin() {
                           </option>
                         )
                       )}
+
                     </select>
                   </div>
 
                 </div>
 
-                <div className="form-group">
-                  <label>URL de l'image</label>
 
-                  <input
-                    type="text"
-                    name="image"
-                    value={dieuData.image}
-                    onChange={handleDieuChange}
-                    placeholder="https://..."
-                  />
+                <div className="images-section">
+
+                  <h4>
+                    🖼️ Images
+                  </h4>
+
+                  <p className="images-help">
+                    Choisis jusqu'à 3 images
+                    depuis ton ordinateur.
+                    Elles seront utilisées dans
+                    le carrousel.
+                  </p>
+
+                  <div className="image-fields">
+
+                    <ImagePicker
+                      label="Image 1 — principale"
+                      value={dieuData.image}
+                      onChange={(value) =>
+                        setDieuData((current) => ({
+                          ...current,
+                          image: value,
+                        }))
+                      }
+                    />
+
+                    <ImagePicker
+                      label="Image 2"
+                      value={dieuData.image2}
+                      onChange={(value) =>
+                        setDieuData((current) => ({
+                          ...current,
+                          image2: value,
+                        }))
+                      }
+                    />
+
+                    <ImagePicker
+                      label="Image 3"
+                      value={dieuData.image3}
+                      onChange={(value) =>
+                        setDieuData((current) => ({
+                          ...current,
+                          image3: value,
+                        }))
+                      }
+                    />
+
+                  </div>
+
                 </div>
 
+
                 <div className="form-group">
-                  <label>Description</label>
+
+                  <label>
+                    Description
+                  </label>
 
                   <textarea
                     name="description"
                     value={dieuData.description}
                     onChange={handleDieuChange}
                     placeholder="Description..."
-                    rows="5"
+                    rows="6"
                     required
                   />
+
                 </div>
+
 
                 <div className="form-actions">
 
@@ -1447,6 +1733,7 @@ function Admin() {
 
             </div>
 
+
             <div className="content-list">
 
               {dieux.map((dieu) => (
@@ -1455,16 +1742,10 @@ function Admin() {
                   key={dieu.id}
                 >
 
-                  {dieu.image ? (
-                    <img
-                      src={dieu.image}
-                      alt={dieu.nom}
-                    />
-                  ) : (
-                    <div className="admin-card-no-image">
-                      🏛️
-                    </div>
-                  )}
+                  <CardImages
+                    item={dieu}
+                    fallback="🏛️"
+                  />
 
                   <div className="admin-card-info">
 
@@ -1473,7 +1754,9 @@ function Admin() {
                         "Civilisation"}
                     </span>
 
-                    <h3>{dieu.nom}</h3>
+                    <h3>
+                      {dieu.nom}
+                    </h3>
 
                     <p>
                       {dieu.description}
@@ -1511,8 +1794,9 @@ function Admin() {
           </section>
         )}
 
+
         {/* ======================================================
-            HEROS ET CREATURES
+            HEROS & CREATURES
             ====================================================== */}
 
         {activeSection === "heros" && (
@@ -1526,6 +1810,7 @@ function Admin() {
                 des héros et créatures.
               </p>
             </div>
+
 
             <div className="admin-form-card">
 
@@ -1546,7 +1831,10 @@ function Admin() {
                 <div className="form-grid">
 
                   <div className="form-group">
-                    <label>Nom</label>
+
+                    <label>
+                      Nom
+                    </label>
 
                     <input
                       type="text"
@@ -1556,10 +1844,15 @@ function Admin() {
                       placeholder="Ex : Thor"
                       required
                     />
+
                   </div>
 
+
                   <div className="form-group">
-                    <label>Type</label>
+
+                    <label>
+                      Type
+                    </label>
 
                     <select
                       name="type"
@@ -1575,12 +1868,17 @@ function Admin() {
                         🐉 Créature
                       </option>
                     </select>
+
                   </div>
 
                 </div>
 
+
                 <div className="form-group">
-                  <label>Civilisation</label>
+
+                  <label>
+                    Civilisation
+                  </label>
 
                   <select
                     name="civilisation_id"
@@ -1604,33 +1902,82 @@ function Admin() {
                         </option>
                       )
                     )}
+
                   </select>
+
                 </div>
 
-                <div className="form-group">
-                  <label>URL de l'image</label>
 
-                  <input
-                    type="text"
-                    name="image"
-                    value={heroData.image}
-                    onChange={handleHeroChange}
-                    placeholder="https://..."
-                  />
+                <div className="images-section">
+
+                  <h4>
+                    🖼️ Images
+                  </h4>
+
+                  <p className="images-help">
+                    Choisis jusqu'à 3 images
+                    depuis ton ordinateur.
+                    Elles seront utilisées dans
+                    le carrousel.
+                  </p>
+
+                  <div className="image-fields">
+
+                    <ImagePicker
+                      label="Image 1 — principale"
+                      value={heroData.image}
+                      onChange={(value) =>
+                        setHeroData((current) => ({
+                          ...current,
+                          image: value,
+                        }))
+                      }
+                    />
+
+                    <ImagePicker
+                      label="Image 2"
+                      value={heroData.image2}
+                      onChange={(value) =>
+                        setHeroData((current) => ({
+                          ...current,
+                          image2: value,
+                        }))
+                      }
+                    />
+
+                    <ImagePicker
+                      label="Image 3"
+                      value={heroData.image3}
+                      onChange={(value) =>
+                        setHeroData((current) => ({
+                          ...current,
+                          image3: value,
+                        }))
+                      }
+                    />
+
+                  </div>
+
                 </div>
 
+
                 <div className="form-group">
-                  <label>Description</label>
+
+                  <label>
+                    Description
+                  </label>
 
                   <textarea
                     name="description"
                     value={heroData.description}
                     onChange={handleHeroChange}
                     placeholder="Description..."
-                    rows="5"
+                    rows="6"
                     required
                   />
+
                 </div>
+
 
                 <div className="form-actions">
 
@@ -1659,6 +2006,7 @@ function Admin() {
 
             </div>
 
+
             <div className="content-list">
 
               {heros.map((hero) => (
@@ -1667,18 +2015,14 @@ function Admin() {
                   key={hero.id}
                 >
 
-                  {hero.image ? (
-                    <img
-                      src={hero.image}
-                      alt={hero.nom}
-                    />
-                  ) : (
-                    <div className="admin-card-no-image">
-                      {hero.type === "héros"
+                  <CardImages
+                    item={hero}
+                    fallback={
+                      hero.type === "héros"
                         ? "⚔️"
-                        : "🐉"}
-                    </div>
-                  )}
+                        : "🐉"
+                    }
+                  />
 
                   <div className="admin-card-info">
 
@@ -1688,7 +2032,9 @@ function Admin() {
                         : "🐉 Créature"}
                     </span>
 
-                    <h3>{hero.nom}</h3>
+                    <h3>
+                      {hero.nom}
+                    </h3>
 
                     <p>
                       {hero.description}
@@ -1731,6 +2077,7 @@ function Admin() {
           </section>
         )}
 
+
         {/* ======================================================
             MYTHES
             ====================================================== */}
@@ -1746,6 +2093,7 @@ function Admin() {
                 des mythes et légendes.
               </p>
             </div>
+
 
             <div className="admin-form-card">
 
@@ -1764,7 +2112,10 @@ function Admin() {
               >
 
                 <div className="form-group">
-                  <label>Titre</label>
+
+                  <label>
+                    Titre
+                  </label>
 
                   <input
                     type="text"
@@ -1774,10 +2125,15 @@ function Admin() {
                     placeholder="Ex : La naissance du Soleil"
                     required
                   />
+
                 </div>
 
+
                 <div className="form-group">
-                  <label>Civilisation</label>
+
+                  <label>
+                    Civilisation
+                  </label>
 
                   <select
                     name="civilisation_id"
@@ -1801,33 +2157,82 @@ function Admin() {
                         </option>
                       )
                     )}
+
                   </select>
+
                 </div>
 
-                <div className="form-group">
-                  <label>URL de l'image</label>
 
-                  <input
-                    type="text"
-                    name="image"
-                    value={mytheData.image}
-                    onChange={handleMytheChange}
-                    placeholder="https://..."
-                  />
+                <div className="images-section">
+
+                  <h4>
+                    🖼️ Images
+                  </h4>
+
+                  <p className="images-help">
+                    Choisis jusqu'à 3 images
+                    depuis ton ordinateur.
+                    Elles seront utilisées dans
+                    le carrousel.
+                  </p>
+
+                  <div className="image-fields">
+
+                    <ImagePicker
+                      label="Image 1 — principale"
+                      value={mytheData.image}
+                      onChange={(value) =>
+                        setMytheData((current) => ({
+                          ...current,
+                          image: value,
+                        }))
+                      }
+                    />
+
+                    <ImagePicker
+                      label="Image 2"
+                      value={mytheData.image2}
+                      onChange={(value) =>
+                        setMytheData((current) => ({
+                          ...current,
+                          image2: value,
+                        }))
+                      }
+                    />
+
+                    <ImagePicker
+                      label="Image 3"
+                      value={mytheData.image3}
+                      onChange={(value) =>
+                        setMytheData((current) => ({
+                          ...current,
+                          image3: value,
+                        }))
+                      }
+                    />
+
+                  </div>
+
                 </div>
 
+
                 <div className="form-group">
-                  <label>Description</label>
+
+                  <label>
+                    Description
+                  </label>
 
                   <textarea
                     name="description"
                     value={mytheData.description}
                     onChange={handleMytheChange}
                     placeholder="Description du mythe..."
-                    rows="6"
+                    rows="7"
                     required
                   />
+
                 </div>
+
 
                 <div className="form-actions">
 
@@ -1856,6 +2261,7 @@ function Admin() {
 
             </div>
 
+
             <div className="content-list">
 
               {mythes.map((mythe) => (
@@ -1864,16 +2270,10 @@ function Admin() {
                   key={mythe.id}
                 >
 
-                  {mythe.image ? (
-                    <img
-                      src={mythe.image}
-                      alt={mythe.titre}
-                    />
-                  ) : (
-                    <div className="admin-card-no-image">
-                      📜
-                    </div>
-                  )}
+                  <CardImages
+                    item={mythe}
+                    fallback="📜"
+                  />
 
                   <div className="admin-card-info">
 
@@ -1881,7 +2281,9 @@ function Admin() {
                       📜 Mythe & légende
                     </span>
 
-                    <h3>{mythe.titre}</h3>
+                    <h3>
+                      {mythe.titre}
+                    </h3>
 
                     <p>
                       {mythe.description}

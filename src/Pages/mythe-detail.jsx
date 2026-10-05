@@ -11,6 +11,8 @@ function MytheDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  const [imageActuelle, setImageActuelle] = useState(0);
+
   useEffect(() => {
     const chargerMythe = async () => {
       try {
@@ -26,18 +28,16 @@ function MytheDetail() {
         if (!response.ok) {
           throw new Error(
             data.message ||
-              "Mythe introuvable."
+              "Mythe ou légende introuvable."
           );
         }
 
         setMythe(data.mythe);
-
       } catch (error) {
         console.error(error);
 
         setError(
-          error.message ||
-            "Une erreur est survenue."
+          error.message || "Une erreur est survenue."
         );
       } finally {
         setLoading(false);
@@ -60,16 +60,13 @@ function MytheDetail() {
   if (error || !mythe) {
     return (
       <main className="detail-page">
-
         <div className="detail-message">
 
-          <h1>
-            Une erreur est survenue
-          </h1>
+          <h1>Une erreur est survenue</h1>
 
           <p>
             {error ||
-              "Mythe introuvable."}
+              "Mythe ou légende introuvable."}
           </p>
 
           <Link
@@ -80,10 +77,35 @@ function MytheDetail() {
           </Link>
 
         </div>
-
       </main>
     );
   }
+
+  const images = [
+    mythe.image,
+    mythe.image2,
+    mythe.image3,
+  ].filter(Boolean);
+
+  const imageSuivante = () => {
+    if (images.length === 0) return;
+
+    setImageActuelle((ancienneImage) =>
+      ancienneImage === images.length - 1
+        ? 0
+        : ancienneImage + 1
+    );
+  };
+
+  const imagePrecedente = () => {
+    if (images.length === 0) return;
+
+    setImageActuelle((ancienneImage) =>
+      ancienneImage === 0
+        ? images.length - 1
+        : ancienneImage - 1
+    );
+  };
 
   return (
     <main className="detail-page">
@@ -99,16 +121,70 @@ function MytheDetail() {
 
         <div className="detail-image-container">
 
-          {mythe.image ? (
-            <img
-              src={mythe.image}
-              alt={mythe.titre}
-              className="detail-image"
-            />
+          {images.length > 0 ? (
+
+            <div className="detail-carousel">
+
+              <img
+                src={images[imageActuelle]}
+                alt={`${mythe.titre} - image ${
+                  imageActuelle + 1
+                }`}
+                className="detail-image"
+              />
+
+              {images.length > 1 && (
+                <>
+                  <button
+                    type="button"
+                    className="carousel-button carousel-button-left"
+                    onClick={imagePrecedente}
+                    aria-label="Image précédente"
+                  >
+                    ←
+                  </button>
+
+                  <button
+                    type="button"
+                    className="carousel-button carousel-button-right"
+                    onClick={imageSuivante}
+                    aria-label="Image suivante"
+                  >
+                    →
+                  </button>
+
+                  <div className="carousel-indicators">
+
+                    {images.map((_, index) => (
+                      <button
+                        key={index}
+                        type="button"
+                        className={`carousel-indicator ${
+                          index === imageActuelle
+                            ? "active"
+                            : ""
+                        }`}
+                        onClick={() =>
+                          setImageActuelle(index)
+                        }
+                        aria-label={`Afficher l'image ${
+                          index + 1
+                        }`}
+                      />
+                    ))}
+
+                  </div>
+                </>
+              )}
+
+            </div>
+
           ) : (
+
             <div className="detail-image-placeholder">
               📖
             </div>
+
           )}
 
         </div>

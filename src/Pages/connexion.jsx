@@ -2,203 +2,125 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./connexion.css";
 
-const API_URL = "http://localhost:5000";
-
 function Connexion() {
   const navigate = useNavigate();
 
-  const [form, setForm] = useState({
-    email: "",
-    password: "",
-  });
-
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleChange = (event) => {
-    setForm({
-      ...form,
-      [event.target.name]: event.target.value,
-    });
-  };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-
-    setError("");
     setMessage("");
     setLoading(true);
 
     try {
-      const response = await fetch(
-        `${API_URL}/api/auth/login`,
-        {
-          method: "POST",
-
-          headers: {
-            "Content-Type": "application/json",
-          },
-
-          body: JSON.stringify({
-            email: form.email,
-            password: form.password,
-          }),
-        }
-      );
+      const response = await fetch("http://localhost:5000/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      });
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(
-          data.message ||
-          "Erreur lors de la connexion."
-        );
+        setMessage(data.message || "Email ou mot de passe incorrect.");
+        setLoading(false);
+        return;
       }
 
-      /*
-       * Enregistrement du JWT
-       */
-      localStorage.setItem(
-        "token",
-        data.token
-      );
+      // Enregistrement de la connexion
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
 
-      /*
-       * Enregistrement des informations
-       * de l'utilisateur
-       */
-      localStorage.setItem(
-        "user",
-        JSON.stringify(data.user)
-      );
+      // Préviens la Navbar que l'utilisateur est connecté
+      window.dispatchEvent(new Event("authChanged"));
 
-      setMessage(
-        "Connexion réussie !"
-      );
-
-      /*
-       * Si l'utilisateur est administrateur,
-       * on l'envoie vers l'administration.
-       *
-       * Sinon, retour à l'accueil.
-       */
-      setTimeout(() => {
-
-        if (data.user.role === "admin") {
-          navigate("/admin");
-        } else {
-          navigate("/");
-        }
-
-      }, 500);
+      // Si admin → page admin
+      if (data.user.role === "admin") {
+        navigate("/admin");
+      } else {
+        // Sinon → accueil
+        navigate("/");
+      }
 
     } catch (error) {
-
-      console.error(
-        "Erreur connexion :",
-        error
-      );
-
-      setError(
-        error.message ||
-        "Impossible de se connecter."
-      );
-
-    } finally {
-      setLoading(false);
+      console.error("Erreur connexion :", error);
+      setMessage("Impossible de contacter le serveur.");
     }
+
+    setLoading(false);
   };
 
   return (
-    <main className="connexion-page">
+    <div className="connexion-page">
 
       <div className="connexion-card">
 
-        <div className="connexion-header">
+        <h1>Connexion</h1>
 
-          <div className="connexion-icon">
-            🔐
+        <p className="connexion-subtitle">
+          Connectez-vous à votre compte
+        </p>
+
+        <form onSubmit={handleSubmit}>
+
+          <div className="form-group">
+            <label htmlFor="email">
+              Adresse email
+            </label>
+
+            <input
+              id="email"
+              type="email"
+              placeholder="Votre adresse email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
           </div>
 
-          <h1>
-            Se connecter
-          </h1>
+          <div className="form-group">
+            <label htmlFor="password">
+              Mot de passe
+            </label>
 
-          <p>
-            Connectez-vous à votre compte
-            Mythologie.
-          </p>
-
-        </div>
-
-
-        {error && (
-          <div className="connexion-message error">
-            {error}
+            <input
+              id="password"
+              type="password"
+              placeholder="Votre mot de passe"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
           </div>
-        )}
 
-
-        {message && (
-          <div className="connexion-message success">
-            {message}
-          </div>
-        )}
-
-
-        <form
-          className="connexion-form"
-          onSubmit={handleSubmit}
-        >
-
-          <label htmlFor="email">
-            Adresse email
-          </label>
-
-          <input
-            id="email"
-            name="email"
-            type="email"
-            value={form.email}
-            onChange={handleChange}
-            placeholder="exemple@email.com"
-            autoComplete="email"
-            required
-          />
-
-
-          <label htmlFor="password">
-            Mot de passe
-          </label>
-
-          <input
-            id="password"
-            name="password"
-            type="password"
-            value={form.password}
-            onChange={handleChange}
-            placeholder="Votre mot de passe"
-            autoComplete="current-password"
-            required
-          />
-
+          {message && (
+            <p className="connexion-message">
+              {message}
+            </p>
+          )}
 
           <button
             type="submit"
             className="connexion-button"
             disabled={loading}
           >
-            {loading
-              ? "Connexion..."
-              : "Se connecter"}
+            {loading ? "Connexion..." : "Se connecter"}
           </button>
 
         </form>
 
       </div>
 
-    </main>
+    </div>
   );
 }
 

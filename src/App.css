@@ -147,6 +147,7 @@ body {
 .navbar-dropdown-button {
   display: flex;
   align-items: center;
+
   gap: 8px;
 
   padding: 10px 0;
@@ -173,7 +174,7 @@ body {
 
 
 /* =========================================================
-   FLÈCHE
+   FLÈCHE DROPDOWN
    ========================================================= */
 
 .arrow {
@@ -233,7 +234,7 @@ body {
 
 
 /* =========================================================
-   LIENS DU MENU DÉROULANT
+   LIENS DROPDOWN
    ========================================================= */
 
 .dropdown-link {
@@ -304,7 +305,7 @@ body {
 
 
 /* =========================================================
-   PAGE D'ACCUEIL
+   ANCIENNE PAGE D'ACCUEIL
    ========================================================= */
 
 .home {
@@ -324,11 +325,6 @@ body {
   background-color: #4a4a4a;
 }
 
-
-/* =========================================================
-   TITRE ACCUEIL
-   ========================================================= */
-
 .home h1 {
   margin-bottom: 20px;
 
@@ -337,11 +333,6 @@ body {
   font-size: 52px;
   font-weight: bold;
 }
-
-
-/* =========================================================
-   TEXTE ACCUEIL
-   ========================================================= */
 
 .home p {
   width: 100%;
@@ -352,6 +343,829 @@ body {
   font-size: 18px;
 
   line-height: 1.6;
+}
+
+
+/* =========================================================
+   NOUVELLE PAGE D'ACCUEIL
+   ========================================================= */
+
+.home-page {
+  width: 100%;
+  min-height: 100vh;
+
+  background-color: #4a4a4a;
+}
+
+
+/* =========================================================
+   HERO ACCUEIL
+   ========================================================= */
+
+.home-hero {
+  position: relative;
+
+  width: 100%;
+  min-height: 520px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 80px 40px;
+
+  text-align: center;
+
+  background:
+    linear-gradient(
+      135deg,
+      #3a3a3a 0%,
+      #4a4a4a 50%,
+      #363636 100%
+    );
+
+  border-bottom: 1px solid #5a5a5a;
+}
+
+
+/* =========================================================
+   DÉCORATION HERO
+   ========================================================= */
+
+.home-hero::before {
+  content: "";
+
+  position: absolute;
+
+  width: 420px;
+  height: 420px;
+
+  top: 50%;
+  left: 50%;
+
+  transform: translate(-50%, -50%);
+
+  border: 1px solid rgba(212, 175, 55, 0.12);
+
+  border-radius: 50%;
+
+  box-shadow:
+    0 0 80px rgba(212, 175, 55, 0.08);
+}
+
+
+/* =========================================================
+   OVERLAY HERO
+   ========================================================= */
+
+.home-hero-overlay {
+  position: relative;
+
+  z-index: 1;
+
+  width: 100%;
+  max-width: 850px;
+
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+}
+
+
+/* =========================================================
+   PETIT TITRE HERO
+   ========================================================= */
+
+.home-small-title {
+  margin-bottom: 15px;
+
+  color: #d4af37;
+
+  font-size: 13px;
+  font-weight: bold;
+
+  letter-spacing: 4px;
+}
+
+
+/* =========================================================
+   TITRE HERO
+   ========================================================= */
+
+.home-hero h1 {
+  margin-bottom: 25px;
+
+  color: #f0d878;
+
+  font-size: 68px;
+  font-weight: bold;
+
+  letter-spacing: 2px;
+}
+
+
+/* =========================================================
+   DESCRIPTION HERO
+   ========================================================= */
+
+.home-description {
+  width: 100%;
+  max-width: 720px;
+
+  margin-bottom: 35px;
+
+  color: #dddddd;
+
+  font-size: 19px;
+
+  line-height: 1.7;
+}
+
+
+/* =========================================================
+   BOUTON PRINCIPAL
+   ========================================================= */
+
+.home-main-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 14px 28px;
+
+  color: #222222;
+
+  background-color: #d4af37;
+
+  border: 1px solid #d4af37;
+  border-radius: 6px;
+
+  text-decoration: none;
+
+  font-size: 15px;
+  font-weight: bold;
+
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease,
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.home-main-button:hover {
+  background-color: #f0d878;
+
+  border-color: #f0d878;
+
+  transform: translateY(-3px);
+
+  box-shadow:
+    0 8px 25px rgba(212, 175, 55, 0.25);
+}
+
+
+/* =========================================================
+   SECTIONS ACCUEIL
+   ========================================================= */
+
+.home-section {
+  width: 100%;
+  max-width: 1250px;
+
+  margin: 0 auto;
+
+  padding: 75px 40px;
+}
+
+
+/* =========================================================
+   INTRODUCTION
+   ========================================================= */
+
+.home-introduction {
+  max-width: 900px;
+
+  text-align: center;
+}
+
+.home-introduction > p:last-child {
+  max-width: 750px;
+
+  margin: 0 auto;
+
+  color: #d0d0d0;
+
+  font-size: 17px;
+
+  line-height: 1.8;
+}
+
+
+/* =========================================================
+   LABELS SECTIONS
+   ========================================================= */
+
+.home-section-label {
+  margin-bottom: 12px;
+
+  color: #d4af37;
+
+  font-size: 12px;
+  font-weight: bold;
+
+  letter-spacing: 3px;
+}
+
+
+/* =========================================================
+   TITRES SECTIONS
+   ========================================================= */
+
+.home-section h2 {
+  margin-bottom: 20px;
+
+  color: #ffffff;
+
+  font-size: 34px;
+  font-weight: bold;
+}
+
+
+/* =========================================================
+   EN-TÊTE SECTION
+   ========================================================= */
+
+.home-section-header {
+  width: 100%;
+
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+
+  gap: 30px;
+
+  margin-bottom: 35px;
+}
+
+
+/* =========================================================
+   VOIR TOUS
+   ========================================================= */
+
+.home-see-more {
+  display: inline-block;
+
+  padding-bottom: 5px;
+
+  color: #d4af37;
+
+  text-decoration: none;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  white-space: nowrap;
+
+  transition:
+    color 0.3s ease,
+    transform 0.3s ease;
+}
+
+.home-see-more:hover {
+  color: #f0d878;
+
+  transform: translateX(4px);
+}
+
+
+/* =========================================================
+   GRILLE CIVILISATIONS
+   ========================================================= */
+
+.civilisation-home-grid {
+  width: 100%;
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+
+  gap: 20px;
+}
+
+
+/* =========================================================
+   CARTE CIVILISATION
+   ========================================================= */
+
+.civilisation-home-card {
+  min-height: 240px;
+
+  display: flex;
+  align-items: flex-end;
+
+  padding: 25px;
+
+  background:
+    linear-gradient(
+      145deg,
+      #333333,
+      #252525
+    );
+
+  border: 1px solid #5a5a5a;
+  border-radius: 10px;
+
+  color: inherit;
+
+  text-decoration: none;
+
+  transition:
+    transform 0.3s ease,
+    border-color 0.3s ease,
+    box-shadow 0.3s ease,
+    background-color 0.3s ease;
+}
+
+.civilisation-home-card:hover {
+  transform: translateY(-6px);
+
+  border-color: #d4af37;
+
+  background:
+    linear-gradient(
+      145deg,
+      #393939,
+      #292929
+    );
+
+  box-shadow:
+    0 12px 30px rgba(0, 0, 0, 0.35);
+}
+
+
+/* =========================================================
+   CONTENU CARTE CIVILISATION
+   ========================================================= */
+
+.civilisation-card-content {
+  width: 100%;
+}
+
+.civilisation-card-content > span {
+  display: block;
+
+  margin-bottom: 15px;
+
+  color: #d4af37;
+
+  font-size: 25px;
+}
+
+.civilisation-card-content h3 {
+  margin-bottom: 12px;
+
+  color: #ffffff;
+
+  font-size: 21px;
+}
+
+.civilisation-card-content p {
+  margin-bottom: 18px;
+
+  color: #cfcfcf;
+
+  font-size: 14px;
+
+  line-height: 1.6;
+}
+
+.civilisation-card-content strong {
+  color: #d4af37;
+
+  font-size: 14px;
+
+  transition:
+    color 0.3s ease,
+    transform 0.3s ease;
+}
+
+.civilisation-home-card:hover
+.civilisation-card-content strong {
+  color: #f0d878;
+}
+
+
+/* =========================================================
+   GRILLE DIEUX / HÉROS
+   ========================================================= */
+
+.home-content-grid {
+  width: 100%;
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+
+  gap: 22px;
+}
+
+
+/* =========================================================
+   CARTES DIEUX / HÉROS
+   ========================================================= */
+
+.home-content-card {
+  display: flex;
+  flex-direction: column;
+
+  min-width: 0;
+
+  overflow: hidden;
+
+  background-color: #2b2b2b;
+
+  border: 1px solid #555555;
+
+  border-radius: 10px;
+
+  color: inherit;
+
+  text-decoration: none;
+
+  transition:
+    transform 0.3s ease,
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.home-content-card:hover {
+  transform: translateY(-6px);
+
+  border-color: #d4af37;
+
+  box-shadow:
+    0 12px 30px rgba(0, 0, 0, 0.4);
+}
+
+
+/* =========================================================
+   IMAGE CARTES
+   ========================================================= */
+
+.home-content-card img {
+  width: 100%;
+  height: 230px;
+
+  display: block;
+
+  object-fit: cover;
+
+  background-color: #333333;
+}
+
+
+/* =========================================================
+   CONTENU CARTES
+   ========================================================= */
+
+.home-content-card-body {
+  display: flex;
+  flex-direction: column;
+
+  flex: 1;
+
+  padding: 22px;
+}
+
+
+/* =========================================================
+   CATÉGORIE CARTE
+   ========================================================= */
+
+.home-card-category {
+  display: block;
+
+  margin-bottom: 10px;
+
+  color: #d4af37;
+
+  font-size: 11px;
+  font-weight: bold;
+
+  text-transform: uppercase;
+
+  letter-spacing: 1.5px;
+}
+
+
+/* =========================================================
+   TITRE CARTE
+   ========================================================= */
+
+.home-content-card-body h3 {
+  margin-bottom: 12px;
+
+  color: #ffffff;
+
+  font-size: 21px;
+
+  line-height: 1.3;
+}
+
+
+/* =========================================================
+   DESCRIPTION CARTE
+   ========================================================= */
+
+.home-content-card-body p {
+  display: -webkit-box;
+
+  margin-bottom: 0;
+
+  overflow: hidden;
+
+  color: #cccccc;
+
+  font-size: 14px;
+
+  line-height: 1.65;
+
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+}
+
+
+/* =========================================================
+   LIEN DÉCOUVRIR
+   ========================================================= */
+
+.home-card-link {
+  display: inline-block;
+
+  width: fit-content;
+
+  margin-top: auto;
+  padding-top: 18px;
+
+  color: #d4af37;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  transition:
+    color 0.3s ease,
+    transform 0.3s ease;
+}
+
+.home-content-card:hover .home-card-link,
+.home-mythe-card:hover .home-card-link {
+  color: #f0d878;
+
+  transform: translateX(4px);
+}
+
+
+/* =========================================================
+   PLACEHOLDER IMAGE
+   ========================================================= */
+
+.home-card-placeholder {
+  width: 100%;
+  height: 230px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background:
+    linear-gradient(
+      135deg,
+      #333333,
+      #242424
+    );
+
+  color: #d4af37;
+
+  font-size: 55px;
+}
+
+
+/* =========================================================
+   GRILLE MYTHES
+   ========================================================= */
+
+.home-mythes-grid {
+  width: 100%;
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+
+  gap: 22px;
+}
+
+
+/* =========================================================
+   CARTE MYTHE
+   ========================================================= */
+
+.home-mythe-card {
+  display: flex;
+  flex-direction: column;
+
+  min-width: 0;
+
+  overflow: hidden;
+
+  background-color: #2b2b2b;
+
+  border: 1px solid #555555;
+
+  border-radius: 10px;
+
+  color: inherit;
+
+  text-decoration: none;
+
+  transition:
+    transform 0.3s ease,
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.home-mythe-card:hover {
+  transform: translateY(-6px);
+
+  border-color: #d4af37;
+
+  box-shadow:
+    0 12px 30px rgba(0, 0, 0, 0.4);
+}
+
+
+/* =========================================================
+   IMAGE MYTHE
+   ========================================================= */
+
+.home-mythe-card img {
+  width: 100%;
+  height: 250px;
+
+  display: block;
+
+  object-fit: cover;
+
+  background-color: #333333;
+}
+
+
+/* =========================================================
+   CONTENU MYTHE
+   ========================================================= */
+
+.home-mythe-body {
+  display: flex;
+  flex-direction: column;
+
+  flex: 1;
+
+  padding: 22px;
+}
+
+
+/* =========================================================
+   CIVILISATION MYTHE
+   ========================================================= */
+
+.home-mythe-body > span:first-child {
+  margin-bottom: 10px;
+
+  color: #d4af37;
+
+  font-size: 11px;
+  font-weight: bold;
+
+  text-transform: uppercase;
+
+  letter-spacing: 1.5px;
+}
+
+
+/* =========================================================
+   TITRE MYTHE
+   ========================================================= */
+
+.home-mythe-body h3 {
+  margin-bottom: 12px;
+
+  color: #ffffff;
+
+  font-size: 21px;
+
+  line-height: 1.3;
+}
+
+
+/* =========================================================
+   DESCRIPTION MYTHE
+   ========================================================= */
+
+.home-mythe-body p {
+  display: -webkit-box;
+
+  margin-bottom: 0;
+
+  overflow: hidden;
+
+  color: #cccccc;
+
+  font-size: 14px;
+
+  line-height: 1.65;
+
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+}
+
+
+/* =========================================================
+   MESSAGE VIDE
+   ========================================================= */
+
+.home-empty {
+  width: 100%;
+
+  padding: 30px;
+
+  color: #bbbbbb;
+
+  background-color: #2b2b2b;
+
+  border: 1px solid #555555;
+
+  border-radius: 8px;
+
+  text-align: center;
+}
+
+
+/* =========================================================
+   SECTION FINALE
+   ========================================================= */
+
+.home-final {
+  width: 100%;
+
+  padding: 90px 40px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #353535,
+      #242424
+    );
+
+  border-top: 1px solid #555555;
+
+  border-bottom: 1px solid #555555;
+
+  text-align: center;
+}
+
+
+/* =========================================================
+   CONTENU SECTION FINALE
+   ========================================================= */
+
+.home-final > div {
+  width: 100%;
+  max-width: 800px;
+
+  margin: 0 auto;
+}
+
+.home-final h2 {
+  margin-bottom: 20px;
+
+  color: #ffffff;
+
+  font-size: 38px;
+}
+
+.home-final p:not(.home-section-label) {
+  max-width: 650px;
+
+  margin: 0 auto 30px;
+
+  color: #cccccc;
+
+  font-size: 17px;
+
+  line-height: 1.7;
 }
 
 
@@ -400,7 +1214,7 @@ body {
 
 
 /* =========================================================
-   CARTES
+   CARTES GÉNÉRALES
    ========================================================= */
 
 .cards {
@@ -418,7 +1232,7 @@ body {
 
 
 /* =========================================================
-   CARTE
+   CARTE GÉNÉRALE
    ========================================================= */
 
 .card {
@@ -450,7 +1264,7 @@ body {
 
 
 /* =========================================================
-   TITRE CARTE
+   TITRE CARTE GÉNÉRALE
    ========================================================= */
 
 .card h3 {
@@ -463,7 +1277,7 @@ body {
 
 
 /* =========================================================
-   TEXTE CARTE
+   TEXTE CARTE GÉNÉRALE
    ========================================================= */
 
 .card p {
@@ -476,77 +1290,16 @@ body {
 
 
 /* =========================================================
-   BOUTONS GÉNÉRAUX
+   BOUTONS
    ========================================================= */
 
 button {
   font-family: inherit;
 }
 
-/* =========================================================
-   CARTES DE L'ACCUEIL
-   ========================================================= */
-
-.home-content-card,
-.home-mythe-card {
-  text-decoration: none;
-  color: inherit;
-  cursor: pointer;
-}
-
 
 /* =========================================================
-   LIEN "DÉCOUVRIR"
-   ========================================================= */
-
-.home-card-link {
-  display: inline-block;
-
-  margin-top: 1rem;
-
-  color: #d4af37;
-
-  font-size: 0.9rem;
-  font-weight: 600;
-
-  transition:
-    color 0.3s ease,
-    transform 0.3s ease;
-}
-
-
-/* =========================================================
-   HOVER "DÉCOUVRIR"
-   ========================================================= */
-
-.home-content-card:hover .home-card-link,
-.home-mythe-card:hover .home-card-link {
-  color: #f0d878;
-
-  transform: translateX(4px);
-}
-
-
-/* =========================================================
-   HOVER CARTES ACCUEIL
-   ========================================================= */
-
-.home-content-card,
-.home-mythe-card {
-  transition:
-    transform 0.3s ease,
-    border-color 0.3s ease,
-    box-shadow 0.3s ease;
-}
-
-.home-content-card:hover,
-.home-mythe-card:hover {
-  transform: translateY(-5px);
-}
-
-
-/* =========================================================
-   RESPONSIVE — TABLETTE
+   RESPONSIVE — 1100px
    ========================================================= */
 
 @media (max-width: 1100px) {
@@ -568,14 +1321,29 @@ button {
     font-size: 21px;
   }
 
-  .home h1 {
-    font-size: 46px;
+  .home-hero h1 {
+    font-size: 58px;
+  }
+
+  .civilisation-home-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .home-content-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .home-mythes-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
   }
 }
 
 
 /* =========================================================
-   RESPONSIVE — PETIT ÉCRAN
+   RESPONSIVE — 800px
    ========================================================= */
 
 @media (max-width: 800px) {
@@ -610,18 +1378,55 @@ button {
     transform: none;
   }
 
-  .home {
-    min-height: calc(100vh - 250px);
+  .home-hero {
+    min-height: 470px;
 
-    padding: 40px 20px;
+    padding: 60px 25px;
   }
 
-  .home h1 {
-    font-size: 40px;
+  .home-hero h1 {
+    font-size: 48px;
   }
 
-  .home p {
+  .home-description {
     font-size: 17px;
+  }
+
+  .home-section {
+    padding: 60px 25px;
+  }
+
+  .home-section h2 {
+    font-size: 30px;
+  }
+
+  .home-section-header {
+    align-items: flex-start;
+
+    flex-direction: column;
+
+    gap: 10px;
+  }
+
+  .civilisation-home-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .home-content-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .home-mythes-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .home-final {
+    padding: 70px 25px;
+  }
+
+  .home-final h2 {
+    font-size: 32px;
   }
 
   .page {
@@ -635,7 +1440,7 @@ button {
 
 
 /* =========================================================
-   RESPONSIVE — MOBILE
+   RESPONSIVE — 500px
    ========================================================= */
 
 @media (max-width: 500px) {
@@ -671,16 +1476,80 @@ button {
     transform: translateX(-50%);
   }
 
-  .home {
-    padding: 30px 20px;
+  .home-hero {
+    min-height: 430px;
+
+    padding: 50px 20px;
   }
 
-  .home h1 {
-    font-size: 32px;
+  .home-hero::before {
+    width: 300px;
+    height: 300px;
   }
 
-  .home p {
+  .home-small-title {
+    font-size: 11px;
+
+    letter-spacing: 2px;
+  }
+
+  .home-hero h1 {
+    font-size: 38px;
+  }
+
+  .home-description {
     font-size: 16px;
+  }
+
+  .home-main-button {
+    padding: 12px 20px;
+
+    font-size: 14px;
+  }
+
+  .home-section {
+    padding: 45px 20px;
+  }
+
+  .home-section h2 {
+    font-size: 26px;
+  }
+
+  .home-section-label {
+    font-size: 10px;
+
+    letter-spacing: 2px;
+  }
+
+  .home-content-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .home-content-card img,
+  .home-card-placeholder {
+    height: 220px;
+  }
+
+  .home-mythe-card img {
+    height: 220px;
+  }
+
+  .civilisation-home-card {
+    min-height: 220px;
+
+    padding: 22px;
+  }
+
+  .home-final {
+    padding: 60px 20px;
+  }
+
+  .home-final h2 {
+    font-size: 28px;
+  }
+
+  .home-final p:not(.home-section-label) {
+    font-size: 15px;
   }
 
   .page {

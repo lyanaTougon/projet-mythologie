@@ -1,289 +1,546 @@
-/* ============================================================
-   PAGE DETAIL
-   ============================================================ */
+/* =========================================================
+   PAGE DÉTAIL
+   ========================================================= */
 
 .detail-page {
   width: 100%;
   min-height: calc(100vh - 80px);
 
-  padding: 4rem 2rem;
+  padding: 50px 40px 80px;
 
-  box-sizing: border-box;
+  background-color: #4a4a4a;
 }
 
 
-/* ============================================================
+/* =========================================================
    RETOUR
-   ============================================================ */
+   ========================================================= */
 
 .detail-back-link {
-  display: block;
+  display: inline-block;
 
-  width: 100%;
-  max-width: 1200px;
-
-  margin: 0 auto 2rem;
+  margin-bottom: 30px;
 
   color: #d4af37;
 
   text-decoration: none;
 
+  font-size: 14px;
   font-weight: 600;
 
-  transition: 0.3s;
+  transition:
+    color 0.3s ease,
+    transform 0.3s ease;
 }
 
 .detail-back-link:hover {
   color: #f0d878;
+
   transform: translateX(-4px);
 }
 
 
-/* ============================================================
-   CARTE
-   ============================================================ */
+/* =========================================================
+   CARTE DÉTAIL
+   ========================================================= */
 
 .detail-card {
   width: 100%;
   max-width: 1200px;
 
-  min-height: 550px;
+  min-height: 600px;
+
+  display: grid;
+
+  grid-template-columns:
+    minmax(400px, 1fr)
+    minmax(400px, 1fr);
 
   margin: 0 auto;
 
-  display: grid;
-  grid-template-columns: 45% 55%;
-
   overflow: hidden;
 
-  background: #2b2b2b;
+  background-color: #2b2b2b;
 
-  border: 1px solid rgba(212, 175, 55, 0.2);
+  border: 1px solid #5a5a5a;
 
-  border-radius: 16px;
+  border-radius: 12px;
 
   box-shadow:
-    0 15px 50px rgba(0, 0, 0, 0.35);
+    0 15px 45px rgba(0, 0, 0, 0.35);
 }
 
 
-/* ============================================================
-   IMAGE
-   ============================================================ */
+/* =========================================================
+   CONTENEUR IMAGE
+   ========================================================= */
 
 .detail-image-container {
-  min-height: 550px;
+  position: relative;
 
-  background: #222222;
+  width: 100%;
+  min-height: 600px;
 
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  background-color: #242424;
+}
+
+
+/* =========================================================
+   CARROUSEL
+   ========================================================= */
+
+.detail-carousel {
+  position: relative;
+
+  width: 100%;
+  height: 100%;
+  min-height: 600px;
 
   overflow: hidden;
 }
+
+
+/* =========================================================
+   IMAGE
+   ========================================================= */
 
 .detail-image {
   width: 100%;
   height: 100%;
+  min-height: 600px;
 
-  min-height: 550px;
+  display: block;
 
   object-fit: cover;
 
-  display: block;
+  background-color: #242424;
 }
 
-.detail-image-placeholder {
-  width: 100%;
-  height: 100%;
-  min-height: 550px;
+
+/* =========================================================
+   DÉGRADÉ SUR IMAGE
+   ========================================================= */
+
+.detail-carousel::after {
+  content: "";
+
+  position: absolute;
+
+  inset: 0;
+
+  pointer-events: none;
+
+  background:
+    linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.35),
+      transparent 35%
+    );
+}
+
+
+/* =========================================================
+   BOUTONS CARROUSEL
+   ========================================================= */
+
+.carousel-button {
+  position: absolute;
+
+  top: 50%;
+
+  z-index: 5;
+
+  width: 45px;
+  height: 45px;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
+  transform: translateY(-50%);
+
+  border: 1px solid rgba(212, 175, 55, 0.7);
+
+  border-radius: 50%;
+
+  background-color: rgba(34, 34, 34, 0.8);
+
   color: #d4af37;
 
-  font-size: 8rem;
+  font-size: 22px;
 
-  background:
-    radial-gradient(
-      circle at center,
-      #333333 0%,
-      #222222 70%
-    );
+  cursor: pointer;
+
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease,
+    border-color 0.3s ease,
+    transform 0.3s ease;
+}
+
+.carousel-button:hover {
+  background-color: #d4af37;
+
+  color: #222222;
+
+  border-color: #d4af37;
+
+  transform:
+    translateY(-50%)
+    scale(1.08);
 }
 
 
-/* ============================================================
-   CONTENU
-   ============================================================ */
+/* =========================================================
+   BOUTON GAUCHE
+   ========================================================= */
 
-.detail-content {
-  padding: 4rem;
+.carousel-button-left {
+  left: 20px;
+}
+
+
+/* =========================================================
+   BOUTON DROITE
+   ========================================================= */
+
+.carousel-button-right {
+  right: 20px;
+}
+
+
+/* =========================================================
+   INDICATEURS
+   ========================================================= */
+
+.carousel-indicators {
+  position: absolute;
+
+  bottom: 20px;
+  left: 50%;
+
+  z-index: 5;
 
   display: flex;
-  flex-direction: column;
+  align-items: center;
 
-  justify-content: center;
+  gap: 8px;
+
+  transform: translateX(-50%);
 }
+
+
+/* =========================================================
+   INDICATEUR
+   ========================================================= */
+
+.carousel-indicator {
+  width: 9px;
+  height: 9px;
+
+  padding: 0;
+
+  border: 1px solid #d4af37;
+
+  border-radius: 50%;
+
+  background-color: transparent;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.3s ease,
+    transform 0.3s ease;
+}
+
+.carousel-indicator:hover {
+  transform: scale(1.2);
+}
+
+.carousel-indicator.active {
+  background-color: #d4af37;
+
+  transform: scale(1.15);
+}
+
+
+/* =========================================================
+   PLACEHOLDER
+   ========================================================= */
+
+.detail-image-placeholder {
+  width: 100%;
+  height: 100%;
+  min-height: 600px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background:
+    linear-gradient(
+      135deg,
+      #333333,
+      #222222
+    );
+
+  color: #d4af37;
+
+  font-size: 80px;
+}
+
+
+/* =========================================================
+   CONTENU
+   ========================================================= */
+
+.detail-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  padding: 60px;
+}
+
+
+/* =========================================================
+   LABEL
+   ========================================================= */
 
 .detail-label {
-  margin: 0 0 1rem;
+  margin-bottom: 15px;
 
   color: #d4af37;
 
-  font-size: 0.8rem;
-  font-weight: 700;
+  font-size: 12px;
+  font-weight: bold;
 
-  letter-spacing: 0.15em;
-
-  text-transform: uppercase;
+  letter-spacing: 3px;
 }
+
+
+/* =========================================================
+   TITRE
+   ========================================================= */
 
 .detail-content h1 {
-  margin: 0 0 1rem;
+  margin-bottom: 15px;
 
-  color: white;
+  color: #ffffff;
 
-  font-size: 3rem;
+  font-size: 45px;
 
-  line-height: 1.1;
+  line-height: 1.2;
 }
+
+
+/* =========================================================
+   CIVILISATION
+   ========================================================= */
 
 .detail-civilisation {
+  display: inline-block;
+
+  width: fit-content;
+
+  padding: 7px 13px;
+
   color: #d4af37;
 
-  font-size: 1rem;
+  background-color: rgba(212, 175, 55, 0.08);
 
-  font-weight: 600;
+  border: 1px solid rgba(212, 175, 55, 0.35);
+
+  border-radius: 5px;
+
+  font-size: 13px;
 }
+
+
+/* =========================================================
+   SÉPARATEUR
+   ========================================================= */
 
 .detail-separator {
-  width: 80px;
+  width: 70px;
   height: 2px;
 
-  margin: 2rem 0;
+  margin: 30px 0;
 
-  background: #d4af37;
+  background-color: #d4af37;
 }
 
+
+/* =========================================================
+   DESCRIPTION
+   ========================================================= */
+
 .detail-description {
-  margin: 0;
+  color: #d1d1d1;
 
-  color: #d0d0d0;
-
-  font-size: 1.05rem;
+  font-size: 16px;
 
   line-height: 1.9;
 }
 
 
-/* ============================================================
-   ERREUR / CHARGEMENT
-   ============================================================ */
+/* =========================================================
+   MESSAGES
+   ========================================================= */
 
 .detail-message {
   width: 100%;
-  max-width: 800px;
+  max-width: 700px;
 
-  margin: 5rem auto;
+  margin: 80px auto;
 
-  padding: 3rem;
+  padding: 50px;
 
-  box-sizing: border-box;
+  background-color: #2b2b2b;
 
-  background: #2b2b2b;
+  border: 1px solid #5a5a5a;
 
-  border-radius: 14px;
+  border-radius: 10px;
 
   text-align: center;
 }
 
 .detail-message h1 {
-  margin-top: 0;
+  margin-bottom: 15px;
 
-  color: white;
+  color: #d4af37;
+
+  font-size: 30px;
 }
 
 .detail-message p {
-  color: #cfcfcf;
+  margin-bottom: 25px;
+
+  color: #cccccc;
+
+  line-height: 1.6;
 }
+
+
+/* =========================================================
+   BOUTON RETOUR ERREUR
+   ========================================================= */
 
 .detail-back-button {
   display: inline-block;
 
-  margin-top: 1.5rem;
-
-  padding: 0.9rem 1.5rem;
-
-  background: #d4af37;
+  padding: 12px 20px;
 
   color: #222222;
 
-  border-radius: 8px;
+  background-color: #d4af37;
+
+  border-radius: 6px;
 
   text-decoration: none;
 
-  font-weight: 700;
+  font-weight: 600;
 
-  transition: 0.3s;
+  transition:
+    background-color 0.3s ease,
+    transform 0.3s ease;
 }
 
 .detail-back-button:hover {
-  background: #f0d878;
+  background-color: #f0d878;
 
   transform: translateY(-2px);
 }
 
 
-/* ============================================================
-   RESPONSIVE
-   ============================================================ */
+/* =========================================================
+   TABLETTE
+   ========================================================= */
 
 @media (max-width: 900px) {
+
+  .detail-page {
+    padding: 40px 25px 60px;
+  }
+
   .detail-card {
     grid-template-columns: 1fr;
+
+    min-height: auto;
   }
 
   .detail-image-container,
+  .detail-carousel,
   .detail-image,
   .detail-image-placeholder {
-    min-height: 400px;
-    height: 400px;
+    min-height: 500px;
+
+    height: 500px;
   }
 
   .detail-content {
-    padding: 2.5rem;
+    padding: 45px;
   }
 
   .detail-content h1 {
-    font-size: 2.3rem;
+    font-size: 38px;
   }
 }
 
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
 @media (max-width: 600px) {
+
   .detail-page {
-    padding: 2rem 1rem;
+    padding: 30px 15px 50px;
+  }
+
+  .detail-card {
+    border-radius: 8px;
   }
 
   .detail-image-container,
+  .detail-carousel,
   .detail-image,
   .detail-image-placeholder {
-    min-height: 300px;
-    height: 300px;
+    min-height: 380px;
+
+    height: 380px;
+  }
+
+  .carousel-button {
+    width: 38px;
+    height: 38px;
+
+    font-size: 18px;
+  }
+
+  .carousel-button-left {
+    left: 12px;
+  }
+
+  .carousel-button-right {
+    right: 12px;
+  }
+
+  .carousel-indicators {
+    bottom: 15px;
   }
 
   .detail-content {
-    padding: 2rem 1.5rem;
+    padding: 30px 25px;
   }
 
   .detail-content h1 {
-    font-size: 2rem;
+    font-size: 30px;
   }
 
   .detail-description {
-    font-size: 0.95rem;
+    font-size: 15px;
+
+    line-height: 1.8;
   }
 }

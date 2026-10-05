@@ -4,15 +4,11 @@
 
 .connexion-page {
   min-height: calc(100vh - 80px);
-
   display: flex;
   justify-content: center;
   align-items: center;
-
   padding: 40px 20px;
-
   box-sizing: border-box;
-
   background: #4a4a4a;
 }
 
@@ -24,13 +20,9 @@
 .connexion-card {
   width: 100%;
   max-width: 450px;
-
   padding: 35px;
-
   box-sizing: border-box;
-
   background: #2b2b2b;
-
   border: 1px solid #555;
   border-radius: 14px;
 
@@ -45,28 +37,24 @@
 
 .connexion-header {
   text-align: center;
-
   margin-bottom: 30px;
 }
 
 .connexion-icon {
   font-size: 3rem;
-
   margin-bottom: 10px;
 }
 
 .connexion-header h1 {
   margin: 0 0 10px;
-
   color: #f0d878;
-
   font-size: 2rem;
 }
 
 .connexion-header p {
   margin: 0;
-
   color: #ccc;
+  line-height: 1.5;
 }
 
 
@@ -76,29 +64,22 @@
 
 .connexion-message {
   padding: 12px 15px;
-
   margin-bottom: 20px;
-
   border-radius: 7px;
-
   text-align: center;
-
   font-weight: bold;
+  line-height: 1.4;
 }
 
 .connexion-message.error {
   background: #5a2525;
-
   border: 1px solid #d65a5a;
-
   color: #fff;
 }
 
 .connexion-message.success {
   background: #214d32;
-
   border: 1px solid #3fa45d;
-
   color: #fff;
 }
 
@@ -109,42 +90,38 @@
 
 .connexion-form {
   display: flex;
-
   flex-direction: column;
-
   gap: 8px;
 }
 
 .connexion-form label {
   margin-top: 10px;
-
   color: #ddd;
-
   font-weight: bold;
 }
 
 .connexion-form input {
   width: 100%;
-
   padding: 13px;
-
   box-sizing: border-box;
 
   background: #222;
-
   border: 1px solid #555;
-
   border-radius: 7px;
 
   color: white;
-
   font-size: 1rem;
 
   outline: none;
+
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .connexion-form input:focus {
   border-color: #d4af37;
+
+  box-shadow:
+    0 0 0 2px rgba(212, 175, 55, 0.12);
 }
 
 .connexion-form input::placeholder {
@@ -153,39 +130,108 @@
 
 
 /* ============================================================
-   BOUTON
+   BOUTON PRINCIPAL
    ============================================================ */
 
 .connexion-button {
   width: 100%;
-
   margin-top: 20px;
-
   padding: 14px;
 
   border: none;
-
   border-radius: 7px;
 
   background: #d4af37;
-
   color: #222;
 
   font-size: 1rem;
-
   font-weight: bold;
 
   cursor: pointer;
 
-  transition: 0.2s;
+  transition:
+    background 0.2s,
+    transform 0.2s;
 }
 
 .connexion-button:hover {
   background: #f0d878;
+  transform: translateY(-1px);
+}
+
+.connexion-button:active {
+  transform: translateY(0);
 }
 
 .connexion-button:disabled {
   opacity: 0.6;
-
   cursor: not-allowed;
+  transform: none;
+}
+
+
+/* ============================================================
+   CHANGEMENT CONNEXION / INSCRIPTION
+   ============================================================ */
+
+.connexion-switch {
+  margin-top: 25px;
+  padding-top: 22px;
+
+  border-top: 1px solid #555;
+
+  text-align: center;
+}
+
+.connexion-switch p {
+  margin: 0 0 12px;
+
+  color: #bbb;
+  font-size: 0.95rem;
+}
+
+.connexion-switch-button {
+  padding: 0;
+
+  border: none;
+  background: transparent;
+
+  color: #f0d878;
+
+  font-size: 0.95rem;
+  font-weight: bold;
+
+  cursor: pointer;
+
+  transition: color 0.2s;
+}
+
+.connexion-switch-button:hover {
+  color: #ffffff;
+  text-decoration: underline;
+}
+
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 500px) {
+
+  .connexion-page {
+    padding: 25px 15px;
+  }
+
+  .connexion-card {
+    padding: 25px 20px;
+  }
+
+  .connexion-header h1 {
+    font-size: 1.7rem;
+  }
+
+  .connexion-icon {
+    font-size: 2.5rem;
+  }
+
 }

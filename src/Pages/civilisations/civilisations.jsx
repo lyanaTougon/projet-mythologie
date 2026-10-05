@@ -6,24 +6,28 @@ const API_URL = "http://localhost:5000";
 
 const histoires = {
   azteque: {
+    image: "/images/azteque.jpg",
     titre: "Présentation de la mythologie aztèque",
     texte:
       "La mythologie aztèque rassemble les croyances religieuses et les récits des peuples mésoaméricains associés aux Mexicas. Elle met en scène de nombreuses divinités liées au soleil, à la pluie, à la guerre, à la création et à la nature. Les récits aztèques expliquent notamment l’origine du monde, la création de l’humanité et les grands cycles cosmiques. Les dieux Quetzalcóatl, Huitzilopochtli, Tezcatlipoca et Tlaloc occupent une place importante dans cet univers.",
   },
 
   japonaise: {
+    image: "/images/japonaise.jpg",
     titre: "Présentation de la mythologie japonaise",
     texte:
       "La mythologie japonaise repose principalement sur des récits anciens transmis notamment par le Kojiki et le Nihon Shoki. Elle raconte la création des îles japonaises, l’apparition des kami et les relations entre les divinités. Amaterasu, Susanoo, Izanami et Izanagi figurent parmi les personnages majeurs de ces récits. La mythologie japonaise est également liée à de nombreuses légendes populaires mettant en scène des héros, des yōkai et des créatures surnaturelles.",
   },
 
   nordique: {
+    image: "/images/nordique.jpg",
     titre: "Présentation de la mythologie nordique",
     texte:
       "La mythologie nordique est principalement connue à travers les récits scandinaves anciens. Elle présente un univers composé de plusieurs mondes reliés par Yggdrasil et peuplé de dieux, de géants, de héros et de créatures. Odin, Thor, Loki et Freyja sont parmi les figures les plus connues. Les récits nordiques racontent notamment la création du monde, les aventures des dieux et le Ragnarök, événement annonçant la destruction puis le renouvellement du monde.",
   },
 
   egyptienne: {
+    image: "/images/egyptienne.jpg",
     titre: "Présentation de la mythologie égyptienne",
     texte:
       "La mythologie égyptienne s’est développée pendant plusieurs millénaires dans l’Égypte ancienne. Elle comprend de nombreuses divinités associées au soleil, à la mort, à la fertilité, à la protection et au pouvoir royal. Râ, Osiris, Isis, Horus et Anubis comptent parmi les divinités les plus célèbres. Les récits expliquent notamment la création du monde, le cycle solaire, la mort d’Osiris et le jugement des défunts dans l’au-delà.",
@@ -49,6 +53,12 @@ function Civilisations() {
         setLoading(true);
         setError("");
 
+        /*
+         * ============================================================
+         * LISTE DES CIVILISATIONS
+         * ============================================================
+         */
+
         if (!slug) {
           const response = await fetch(
             `${API_URL}/api/civilisations`
@@ -70,6 +80,12 @@ function Civilisations() {
 
           return;
         }
+
+        /*
+         * ============================================================
+         * DÉTAIL D'UNE CIVILISATION
+         * ============================================================
+         */
 
         const [
           civilisationResponse,
@@ -168,10 +184,18 @@ function Civilisations() {
     chargerDonnees();
   }, [slug]);
 
+  /*
+   * ============================================================
+   * CHARGEMENT
+   * ============================================================
+   */
+
   if (loading) {
     return (
       <main className="page">
+
         <div className="page-header">
+
           <p className="page-label">
             MYTHOLOGIE
           </p>
@@ -179,15 +203,25 @@ function Civilisations() {
           <h1>
             Chargement...
           </h1>
+
         </div>
+
       </main>
     );
   }
 
+  /*
+   * ============================================================
+   * ERREUR
+   * ============================================================
+   */
+
   if (error) {
     return (
       <main className="page">
+
         <div className="page-header">
+
           <p className="page-label">
             MYTHOLOGIE
           </p>
@@ -206,7 +240,9 @@ function Civilisations() {
           >
             Retour aux civilisations
           </Link>
+
         </div>
+
       </main>
     );
   }
@@ -218,8 +254,10 @@ function Civilisations() {
    */
 
   if (slug && civilisation) {
+
     const histoire =
       histoires[civilisation.slug] || {
+        image: "/images/default-mythologie.jpg",
         titre: `Présentation de ${civilisation.nom}`,
         texte:
           "Découvrez l’histoire, les croyances, les divinités et les récits de cette civilisation mythologique.",
@@ -227,6 +265,10 @@ function Civilisations() {
 
     return (
       <main className="page civilisation-detail-page">
+
+        {/* =====================================================
+            EN-TÊTE
+        ====================================================== */}
 
         <div className="page-header">
 
@@ -236,20 +278,29 @@ function Civilisations() {
           >
             ← Toutes les civilisations
           </Link>
-
-          <p className="page-label">
-            CIVILISATION
-          </p>
-
           <h1>
             {civilisation.nom}
           </h1>
 
+          {/* =================================================
+              IMAGE PRINCIPALE
+          ================================================= */}
+
+          {histoire.image && (
+            <div className="civilisation-main-image">
+
+              <img
+                src={histoire.image}
+                alt={civilisation.nom}
+              />
+
+            </div>
+          )}
+
         </div>
 
-
         {/* =====================================================
-            HISTOIRE
+            HISTOIRE & CULTURE
         ====================================================== */}
 
         <section className="civilisation-history">
@@ -276,9 +327,8 @@ function Civilisations() {
 
         </section>
 
-
         {/* =====================================================
-            DIEUX
+            DIEUX & DÉESSES
         ====================================================== */}
 
         <section className="civilisation-content-section">
@@ -306,15 +356,15 @@ function Civilisations() {
 
           </div>
 
-
           {dieux.length > 0 ? (
 
             <div className="civilisation-content-grid">
 
               {dieux.slice(0, 4).map((dieu) => (
 
-                <article
+                <Link
                   key={dieu.id}
+                  to={`/dieux-deesses/${dieu.id}`}
                   className="civilisation-content-card"
                 >
 
@@ -349,7 +399,7 @@ function Civilisations() {
 
                   </div>
 
-                </article>
+                </Link>
 
               ))}
 
@@ -364,7 +414,6 @@ function Civilisations() {
           )}
 
         </section>
-
 
         {/* =====================================================
             HÉROS & CRÉATURES
@@ -395,15 +444,15 @@ function Civilisations() {
 
           </div>
 
-
           {heros.length > 0 ? (
 
             <div className="civilisation-content-grid">
 
               {heros.slice(0, 4).map((element) => (
 
-                <article
+                <Link
                   key={element.id}
+                  to={`/heros-creatures/${element.id}`}
                   className="civilisation-content-card"
                 >
 
@@ -438,7 +487,7 @@ function Civilisations() {
 
                   </div>
 
-                </article>
+                </Link>
 
               ))}
 
@@ -454,9 +503,8 @@ function Civilisations() {
 
         </section>
 
-
         {/* =====================================================
-            MYTHES
+            MYTHES & LÉGENDES
         ====================================================== */}
 
         <section className="civilisation-content-section">
@@ -484,15 +532,15 @@ function Civilisations() {
 
           </div>
 
-
           {mythes.length > 0 ? (
 
             <div className="civilisation-content-grid">
 
               {mythes.slice(0, 4).map((mythe) => (
 
-                <article
+                <Link
                   key={mythe.id}
+                  to={`/mythes-legendes/${mythe.id}`}
                   className="civilisation-content-card"
                 >
 
@@ -527,7 +575,7 @@ function Civilisations() {
 
                   </div>
 
-                </article>
+                </Link>
 
               ))}
 
@@ -542,7 +590,6 @@ function Civilisations() {
           )}
 
         </section>
-
 
         {/* =====================================================
             RETOUR
@@ -562,7 +609,6 @@ function Civilisations() {
       </main>
     );
   }
-
 
   /*
    * ============================================================
@@ -591,7 +637,6 @@ function Civilisations() {
         </p>
 
       </div>
-
 
       <section className="cards">
 

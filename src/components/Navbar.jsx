@@ -1,18 +1,51 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 function Navbar() {
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const checkUser = () => {
+      const token = localStorage.getItem("token");
+      const savedUser = localStorage.getItem("user");
+
+      if (token && savedUser) {
+        try {
+          setUser(JSON.parse(savedUser));
+        } catch (error) {
+          console.error("Erreur utilisateur :", error);
+          setUser(null);
+        }
+      } else {
+        setUser(null);
+      }
+    };
+
+    checkUser();
+
+    window.addEventListener("authChanged", checkUser);
+    window.addEventListener("storage", checkUser);
+
+    return () => {
+      window.removeEventListener("authChanged", checkUser);
+      window.removeEventListener("storage", checkUser);
+    };
+  }, []);
+
+  const accountLink =
+    user?.role === "admin"
+      ? "/admin"
+      : "/compte";
+
   return (
     <nav className="navbar">
 
-      {/* LOGO */}
       <Link to="/" className="navbar-logo">
         🏛️ Mythologie
       </Link>
 
-      {/* MENU */}
       <div className="navbar-menu">
 
-        {/* CIVILISATIONS */}
         <div className="navbar-dropdown">
 
           <button className="navbar-dropdown-button">
@@ -51,10 +84,8 @@ function Navbar() {
             </Link>
 
           </div>
-
         </div>
 
-        {/* DIEUX & DÉESSES */}
         <Link
           to="/dieux-deesses"
           className="navbar-link"
@@ -62,7 +93,6 @@ function Navbar() {
           Dieux & déesses
         </Link>
 
-        {/* HÉROS & CRÉATURES */}
         <Link
           to="/heros-creatures"
           className="navbar-link"
@@ -70,7 +100,6 @@ function Navbar() {
           Héros & créatures
         </Link>
 
-        {/* MYTHES & LÉGENDES */}
         <Link
           to="/mythes-legendes"
           className="navbar-link"
@@ -80,13 +109,21 @@ function Navbar() {
 
       </div>
 
-      {/* CONNEXION */}
-      <Link
-        to="/connexion"
-        className="navbar-connexion"
-      >
-        Se connecter
-      </Link>
+      {user ? (
+        <Link
+          to={accountLink}
+          className="navbar-connexion"
+        >
+          Mon compte
+        </Link>
+      ) : (
+        <Link
+          to="/connexion"
+          className="navbar-connexion"
+        >
+          Se connecter
+        </Link>
+      )}
 
     </nav>
   );

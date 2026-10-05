@@ -19,6 +19,7 @@ import HeroDetail from "./Pages/hero-detail.jsx";
 import MytheDetail from "./Pages/mythe-detail.jsx";
 
 import Connexion from "./Pages/connexion.jsx";
+import Compte from "./Pages/compte.jsx";
 import Admin from "./Pages/admin.jsx";
 
 import "./index.css";
@@ -85,6 +86,12 @@ createRoot(document.getElementById("root")).render(
         <Route
           path="/connexion"
           element={<Connexion />}
+        />
+
+        {/* MON COMPTE */}
+        <Route
+          path="/compte"
+          element={<Compte />}
         />
 
         {/* ADMIN */}
