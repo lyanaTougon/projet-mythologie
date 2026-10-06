@@ -25,10 +25,6 @@ function App() {
           fetch(`${API_URL}/api/mythes`),
         ]);
 
-        /* =====================================================
-           CIVILISATIONS
-        ===================================================== */
-
         if (civilisationsResponse.ok) {
           const data = await civilisationsResponse.json();
 
@@ -43,10 +39,6 @@ function App() {
             civilisationsResponse.status
           );
         }
-
-        /* =====================================================
-           DIEUX
-        ===================================================== */
 
         if (dieuxResponse.ok) {
           const data = await dieuxResponse.json();
@@ -63,10 +55,6 @@ function App() {
           );
         }
 
-        /* =====================================================
-           HÉROS & CRÉATURES
-        ===================================================== */
-
         if (herosResponse.ok) {
           const data = await herosResponse.json();
 
@@ -81,10 +69,6 @@ function App() {
             herosResponse.status
           );
         }
-
-        /* =====================================================
-           MYTHES
-        ===================================================== */
 
         if (mythesResponse.ok) {
           const data = await mythesResponse.json();
@@ -119,32 +103,37 @@ function App() {
       ===================================================== */}
 
       <section className="home-hero">
-        <div className="home-hero-overlay">
 
-          <p className="home-small-title">
-            BIENVENUE DANS
-          </p>
+        <div className="home-hero-content">
 
-          <h1>
-            Mythologie
-          </h1>
+          <div className="home-hero-text">
 
-          <p className="home-description">
-            Découvrez les dieux, les héros, les créatures,
-            les mythes et les légendes des grandes civilisations
-            mythologiques.
-          </p>
+            <p className="home-small-title">
+              BIENVENUE DANS
+            </p>
 
-          <Link
-            to="/civilisations"
-            className="home-main-button"
-          >
-            Explorer les civilisations
-          </Link>
+            <h1>
+              Mythologie
+            </h1>
+
+            <p className="home-description">
+              Découvrez les dieux, les héros, les créatures,
+              les mythes et les légendes des grandes civilisations
+              mythologiques.
+            </p>
+
+            <Link
+              to="/civilisations"
+              className="home-main-button"
+            >
+              Explorer les civilisations
+            </Link>
+
+          </div>
 
         </div>
-      </section>
 
+      </section>
 
       {/* =====================================================
           INTRODUCTION
@@ -169,7 +158,6 @@ function App() {
 
       </section>
 
-
       {/* =====================================================
           CIVILISATIONS
       ===================================================== */}
@@ -179,6 +167,7 @@ function App() {
         <div className="home-section-header">
 
           <div>
+
             <p className="home-section-label">
               CIVILISATIONS
             </p>
@@ -186,6 +175,7 @@ function App() {
             <h2>
               Explorez les mythologies
             </h2>
+
           </div>
 
           <Link
@@ -196,7 +186,6 @@ function App() {
           </Link>
 
         </div>
-
 
         <div className="civilisation-home-grid">
 
@@ -247,7 +236,6 @@ function App() {
 
       </section>
 
-
       {/* =====================================================
           DIEUX & DÉESSES
       ===================================================== */}
@@ -257,6 +245,7 @@ function App() {
         <div className="home-section-header">
 
           <div>
+
             <p className="home-section-label">
               DIVINITÉS
             </p>
@@ -264,6 +253,7 @@ function App() {
             <h2>
               Dieux & déesses
             </h2>
+
           </div>
 
           <Link
@@ -274,7 +264,6 @@ function App() {
           </Link>
 
         </div>
-
 
         <div className="home-content-grid">
 
@@ -306,8 +295,7 @@ function App() {
                 <div className="home-content-card-body">
 
                   <span className="home-card-category">
-                    {dieu.civilisation_nom ||
-                      "Mythologie"}
+                    {dieu.civilisation_nom || "Mythologie"}
                   </span>
 
                   <h3>
@@ -341,7 +329,6 @@ function App() {
 
       </section>
 
-
       {/* =====================================================
           HÉROS & CRÉATURES
       ===================================================== */}
@@ -351,6 +338,7 @@ function App() {
         <div className="home-section-header">
 
           <div>
+
             <p className="home-section-label">
               LÉGENDES
             </p>
@@ -358,6 +346,7 @@ function App() {
             <h2>
               Héros & créatures
             </h2>
+
           </div>
 
           <Link
@@ -368,7 +357,6 @@ function App() {
           </Link>
 
         </div>
-
 
         <div className="home-content-grid">
 
@@ -434,7 +422,6 @@ function App() {
 
       </section>
 
-
       {/* =====================================================
           MYTHES & LÉGENDES
       ===================================================== */}
@@ -444,6 +431,7 @@ function App() {
         <div className="home-section-header">
 
           <div>
+
             <p className="home-section-label">
               RÉCITS
             </p>
@@ -451,6 +439,7 @@ function App() {
             <h2>
               Mythes & légendes
             </h2>
+
           </div>
 
           <Link
@@ -461,7 +450,6 @@ function App() {
           </Link>
 
         </div>
-
 
         <div className="home-mythes-grid">
 
@@ -493,8 +481,7 @@ function App() {
                 <div className="home-mythe-body">
 
                   <span>
-                    {mythe.civilisation_nom ||
-                      "Mythologie"}
+                    {mythe.civilisation_nom || "Mythologie"}
                   </span>
 
                   <h3>
@@ -527,7 +514,6 @@ function App() {
         </div>
 
       </section>
-
 
       {/* =====================================================
           CTA FINAL

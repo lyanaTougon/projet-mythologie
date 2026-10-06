@@ -27,7 +27,7 @@ body {
 
   font-family: Arial, sans-serif;
 
-  background-color: #4a4a4a;
+  background-color: #303030dc;
   color: #ffffff;
 
   overflow-x: hidden;
@@ -62,7 +62,7 @@ body {
 
   padding: 0 40px;
 
-  background-color: #2f2f2f;
+  background-color: #1b1b1b;
 
   border-bottom: 1px solid #5a5a5a;
 
@@ -354,82 +354,76 @@ body {
   width: 100%;
   min-height: 100vh;
 
-  background-color: #4a4a4a;
+  background: linear-gradient(
+    to bottom,
+    #000000 0%,
+    #2a2a2a 35%,
+    #585858 60%,
+    #a2a2a2 100%
+  );
 }
 
 
 /* =========================================================
    HERO ACCUEIL
+   IMAGE + DÉGRADÉ NOIR PLUS LONG, PUIS GRIS
    ========================================================= */
-
 .home-hero {
   position: relative;
 
   width: 100%;
-  min-height: 520px;
+  min-height: 600px;
 
   display: flex;
   align-items: center;
-  justify-content: center;
 
-  padding: 80px 40px;
+  padding: 70px 7%;
 
-  text-align: center;
+  background-image: url("./images/accueil.jpg");
 
-  background:
-    linear-gradient(
-      135deg,
-      #3a3a3a 0%,
-      #4a4a4a 50%,
-      #363636 100%
-    );
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 
-  border-bottom: 1px solid #5a5a5a;
+  background-color: #000000;
+
+  border-bottom: none;
+  overflow: hidden;
 }
 
 
 /* =========================================================
-   DÉCORATION HERO
+   CONTENU HERO
    ========================================================= */
 
-.home-hero::before {
-  content: "";
-
-  position: absolute;
-
-  width: 420px;
-  height: 420px;
-
-  top: 50%;
-  left: 50%;
-
-  transform: translate(-50%, -50%);
-
-  border: 1px solid rgba(212, 175, 55, 0.12);
-
-  border-radius: 50%;
-
-  box-shadow:
-    0 0 80px rgba(212, 175, 55, 0.08);
-}
-
-
-/* =========================================================
-   OVERLAY HERO
-   ========================================================= */
-
-.home-hero-overlay {
+.home-hero-content {
   position: relative;
 
   z-index: 1;
 
   width: 100%;
-  max-width: 850px;
+  max-width: 1400px;
+
+  margin: 0 auto;
 
   display: flex;
-  flex-direction: column;
-
   align-items: center;
+  justify-content: space-between;
+
+  gap: 70px;
+}
+
+
+/* =========================================================
+   TEXTE HERO À GAUCHE
+   ========================================================= */
+
+.home-hero-text {
+  flex: 1;
+
+  max-width: 600px;
+
+  text-align: left;
 }
 
 
@@ -462,6 +456,8 @@ body {
   font-weight: bold;
 
   letter-spacing: 2px;
+
+  line-height: 1.1;
 }
 
 
@@ -471,7 +467,7 @@ body {
 
 .home-description {
   width: 100%;
-  max-width: 720px;
+  max-width: 580px;
 
   margin-bottom: 35px;
 
@@ -492,14 +488,14 @@ body {
   align-items: center;
   justify-content: center;
 
-  padding: 14px 28px;
+  padding: 14px 30px;
 
   color: #222222;
 
   background-color: #d4af37;
 
   border: 1px solid #d4af37;
-  border-radius: 6px;
+  border-radius: 50px;
 
   text-decoration: none;
 
@@ -518,10 +514,50 @@ body {
 
   border-color: #f0d878;
 
+  color: #222222;
+
   transform: translateY(-3px);
 
   box-shadow:
     0 8px 25px rgba(212, 175, 55, 0.25);
+}
+
+
+/* =========================================================
+   ANCIEN CONTENEUR IMAGE HERO
+   CONSERVÉ POUR NE PAS CASSER D'AUTRES ÉLÉMENTS
+   ========================================================= */
+
+.home-hero-image {
+  display: none;
+}
+
+
+/* =========================================================
+   DÉCORATION HERO
+   ========================================================= */
+
+.home-hero::before {
+  content: "";
+
+  position: absolute;
+
+  width: 500px;
+  height: 500px;
+
+  top: 50%;
+  left: 45%;
+
+  transform: translate(-50%, -50%);
+
+  border: 1px solid rgba(212, 175, 55, 0.08);
+
+  border-radius: 50%;
+
+  box-shadow:
+    0 0 100px rgba(212, 175, 55, 0.06);
+
+  pointer-events: none;
 }
 
 
@@ -1321,6 +1357,14 @@ button {
     font-size: 21px;
   }
 
+  .home-hero {
+    padding: 60px 5%;
+  }
+
+  .home-hero-content {
+    gap: 40px;
+  }
+
   .home-hero h1 {
     font-size: 58px;
   }
@@ -1378,19 +1422,38 @@ button {
     transform: none;
   }
 
+
+  /* HERO MOBILE */
+
   .home-hero {
-    min-height: 470px;
+    min-height: 600px;
 
     padding: 60px 25px;
+  }
+
+  .home-hero-content {
+    flex-direction: column;
+
+    gap: 45px;
+
+    text-align: center;
+  }
+
+  .home-hero-text {
+    max-width: 700px;
+
+    text-align: center;
+  }
+
+  .home-description {
+    margin-left: auto;
+    margin-right: auto;
   }
 
   .home-hero h1 {
     font-size: 48px;
   }
 
-  .home-description {
-    font-size: 17px;
-  }
 
   .home-section {
     padding: 60px 25px;
@@ -1476,8 +1539,11 @@ button {
     transform: translateX(-50%);
   }
 
+
+  /* HERO PETIT ÉCRAN */
+
   .home-hero {
-    min-height: 430px;
+    min-height: 550px;
 
     padding: 50px 20px;
   }
@@ -1485,6 +1551,10 @@ button {
   .home-hero::before {
     width: 300px;
     height: 300px;
+  }
+
+  .home-hero-content {
+    gap: 35px;
   }
 
   .home-small-title {
@@ -1506,6 +1576,7 @@ button {
 
     font-size: 14px;
   }
+
 
   .home-section {
     padding: 45px 20px;
