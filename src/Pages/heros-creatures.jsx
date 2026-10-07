@@ -207,8 +207,7 @@ function HerosCreatures() {
 
         <p>
           Découvrez les héros légendaires et les
-          créatures fascinantes des différentes
-          civilisations mythologiques.
+          créatures fascinantes.
         </p>
 
       </section>

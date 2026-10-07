@@ -2,11 +2,15 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import "./civilisations.css";
 
+import mythoAzteque from "../../images/mytho-azteque.jpg";
+import mythoAzteque2 from "../../images/mytho-azteque2.jpg";
+
 const API_URL = "http://localhost:5000";
 
 const histoires = {
   azteque: {
-    image: "/images/azteque.jpg",
+    image: mythoAzteque,
+    image2: mythoAzteque2,
     titre: "Présentation de la mythologie aztèque",
     texte:
       "La mythologie aztèque rassemble les croyances religieuses et les récits des peuples mésoaméricains associés aux Mexicas. Elle met en scène de nombreuses divinités liées au soleil, à la pluie, à la guerre, à la création et à la nature. Les récits aztèques expliquent notamment l’origine du monde, la création de l’humanité et les grands cycles cosmiques. Les dieux Quetzalcóatl, Huitzilopochtli, Tezcatlipoca et Tlaloc occupent une place importante dans cet univers.",
@@ -14,6 +18,7 @@ const histoires = {
 
   japonaise: {
     image: "/images/japonaise.jpg",
+    image2: "/images/japonaise2.jpg",
     titre: "Présentation de la mythologie japonaise",
     texte:
       "La mythologie japonaise repose principalement sur des récits anciens transmis notamment par le Kojiki et le Nihon Shoki. Elle raconte la création des îles japonaises, l’apparition des kami et les relations entre les divinités. Amaterasu, Susanoo, Izanami et Izanagi figurent parmi les personnages majeurs de ces récits. La mythologie japonaise est également liée à de nombreuses légendes populaires mettant en scène des héros, des yōkai et des créatures surnaturelles.",
@@ -21,6 +26,7 @@ const histoires = {
 
   nordique: {
     image: "/images/nordique.jpg",
+    image2: "/images/nordique2.jpg",
     titre: "Présentation de la mythologie nordique",
     texte:
       "La mythologie nordique est principalement connue à travers les récits scandinaves anciens. Elle présente un univers composé de plusieurs mondes reliés par Yggdrasil et peuplé de dieux, de géants, de héros et de créatures. Odin, Thor, Loki et Freyja sont parmi les figures les plus connues. Les récits nordiques racontent notamment la création du monde, les aventures des dieux et le Ragnarök, événement annonçant la destruction puis le renouvellement du monde.",
@@ -28,6 +34,7 @@ const histoires = {
 
   egyptienne: {
     image: "/images/egyptienne.jpg",
+    image2: "/images/egyptienne2.jpg",
     titre: "Présentation de la mythologie égyptienne",
     texte:
       "La mythologie égyptienne s’est développée pendant plusieurs millénaires dans l’Égypte ancienne. Elle comprend de nombreuses divinités associées au soleil, à la mort, à la fertilité, à la protection et au pouvoir royal. Râ, Osiris, Isis, Horus et Anubis comptent parmi les divinités les plus célèbres. Les récits expliquent notamment la création du monde, le cycle solaire, la mort d’Osiris et le jugement des défunts dans l’au-delà.",
@@ -53,11 +60,9 @@ function Civilisations() {
         setLoading(true);
         setError("");
 
-        /*
-         * ============================================================
-         * LISTE DES CIVILISATIONS
-         * ============================================================
-         */
+        // ============================================================
+        // LISTE DES CIVILISATIONS
+        // ============================================================
 
         if (!slug) {
           const response = await fetch(
@@ -81,11 +86,9 @@ function Civilisations() {
           return;
         }
 
-        /*
-         * ============================================================
-         * DÉTAIL D'UNE CIVILISATION
-         * ============================================================
-         */
+        // ============================================================
+        // DÉTAIL D'UNE CIVILISATION
+        // ============================================================
 
         const [
           civilisationResponse,
@@ -184,18 +187,14 @@ function Civilisations() {
     chargerDonnees();
   }, [slug]);
 
-  /*
-   * ============================================================
-   * CHARGEMENT
-   * ============================================================
-   */
+  // ============================================================
+  // CHARGEMENT
+  // ============================================================
 
   if (loading) {
     return (
-      <main className="page">
-
+      <main className="page civilisation-background">
         <div className="page-header">
-
           <p className="page-label">
             MYTHOLOGIE
           </p>
@@ -203,25 +202,19 @@ function Civilisations() {
           <h1>
             Chargement...
           </h1>
-
         </div>
-
       </main>
     );
   }
 
-  /*
-   * ============================================================
-   * ERREUR
-   * ============================================================
-   */
+  // ============================================================
+  // ERREUR
+  // ============================================================
 
   if (error) {
     return (
-      <main className="page">
-
+      <main className="page civilisation-background">
         <div className="page-header">
-
           <p className="page-label">
             MYTHOLOGIE
           </p>
@@ -240,90 +233,102 @@ function Civilisations() {
           >
             Retour aux civilisations
           </Link>
-
         </div>
-
       </main>
     );
   }
 
-  /*
-   * ============================================================
-   * PAGE DÉTAIL D'UNE CIVILISATION
-   * ============================================================
-   */
+  // ============================================================
+  // PAGE DÉTAIL D'UNE CIVILISATION
+  // ============================================================
 
   if (slug && civilisation) {
-
     const histoire =
       histoires[civilisation.slug] || {
         image: "/images/default-mythologie.jpg",
+        image2: null,
         titre: `Présentation de ${civilisation.nom}`,
         texte:
           "Découvrez l’histoire, les croyances, les divinités et les récits de cette civilisation mythologique.",
       };
 
     return (
-      <main className="page civilisation-detail-page">
+      <main className="page civilisation-detail-page civilisation-background">
 
         {/* =====================================================
-            EN-TÊTE
+            INTRODUCTION
         ====================================================== */}
 
-        <div className="page-header">
+        <section
+          className={`civilisation-intro civilisation-intro-${civilisation.slug}`}
+        >
 
-          <Link
-            to="/civilisations"
-            className="back-link"
-          >
-            ← Toutes les civilisations
-          </Link>
-          <h1>
-            {civilisation.nom}
-          </h1>
+          {/* =========================
+              LES DEUX IMAGES
+          ========================== */}
 
-          {/* =================================================
-              IMAGE PRINCIPALE
-          ================================================= */}
+          <div className="civilisation-image-cards">
 
-          {histoire.image && (
-            <div className="civilisation-main-image">
+            {histoire.image && (
+              <div className="civilisation-image-card image-card-1">
 
-              <img
-                src={histoire.image}
-                alt={civilisation.nom}
-              />
+                <img
+                  src={histoire.image}
+                  alt={`${civilisation.nom} - image 1`}
+                />
 
-            </div>
-          )}
+              </div>
+            )}
 
-        </div>
+            {histoire.image2 && (
+              <div className="civilisation-image-card image-card-2">
 
-        {/* =====================================================
-            HISTOIRE & CULTURE
-        ====================================================== */}
+                <img
+                  src={histoire.image2}
+                  alt={`${civilisation.nom} - image 2`}
+                />
 
-        <section className="civilisation-history">
-
-          <div className="civilisation-section-heading">
-
-            <p className="page-label">
-              HISTOIRE & CULTURE
-            </p>
-
-            <h2>
-              {histoire.titre}
-            </h2>
+              </div>
+            )}
 
           </div>
 
-          <div className="civilisation-history-text">
+          {/* =========================
+              TEXTE
+          ========================== */}
 
-            <p>
-              {histoire.texte}
-            </p>
+        <div className="civilisation-intro-content">
 
-          </div>
+  <h1>
+    {civilisation.nom}
+  </h1>
+
+  <div className="civilisation-section-heading">
+
+    <p className="page-label">
+      HISTOIRE & CULTURE
+    </p>
+
+    <h2>
+      {histoire.titre}
+    </h2>
+
+  </div>
+
+  <div className="civilisation-history-text">
+    <p>
+      {histoire.texte}
+    </p>
+  </div>
+
+  <Link
+    to="/civilisations"
+    className="back-link"
+  >
+    ← Toutes les civilisations
+  </Link>
+
+</div>
 
         </section>
 
@@ -610,14 +615,12 @@ function Civilisations() {
     );
   }
 
-  /*
-   * ============================================================
-   * LISTE DES CIVILISATIONS
-   * ============================================================
-   */
+  // ============================================================
+  // LISTE DES CIVILISATIONS
+  // ============================================================
 
   return (
-    <main className="page">
+    <main className="page civilisation-background">
 
       <div className="page-header">
 

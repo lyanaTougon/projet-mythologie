@@ -126,7 +126,7 @@ function App() {
               to="/civilisations"
               className="home-main-button"
             >
-              Explorer les civilisations
+              Explorer les civilisations →
             </Link>
 
           </div>

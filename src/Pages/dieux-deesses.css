@@ -1,57 +1,78 @@
 /* ============================================================
-   PAGE DIEUX & DÉESSES
+   PAGE CATALOGUE
    ============================================================ */
 
 .catalogue-page {
   width: 100%;
   min-height: 100vh;
 
-  padding: 3rem 5% 5rem;
+  padding: 4rem 5% 6rem;
 
   box-sizing: border-box;
 }
 
 
 /* ============================================================
-   HEADER
+   EN-TÊTE
    ============================================================ */
 
 .catalogue-header {
   max-width: 1200px;
 
-  margin: 0 auto 3rem;
+  margin: 0 auto 4rem;
+
+  padding: 1rem 0;
+
+  text-align: left;
 }
 
+
+/* Petit titre doré */
+
 .catalogue-label {
-  margin: 0 0 0.5rem;
+  margin: 0 0 1.5rem;
 
   color: #d4af37;
 
-  font-size: 0.8rem;
+  font-size: 0.78rem;
 
   font-weight: 700;
 
-  letter-spacing: 0.12em;
+  letter-spacing: 0.18em;
 
   text-transform: uppercase;
 }
 
+
+/* Grand titre */
+
 .catalogue-header h1 {
-  margin: 0 0 1rem;
+  margin: 0 0 1.8rem;
 
-  color: white;
+  color: #ffffff;
 
-  font-size: 2.8rem;
+  font-size: 3rem;
+
+  font-weight: 700;
+
+  line-height: 1.1;
+
+  letter-spacing: -0.02em;
 }
+
+
+/* Description */
 
 .catalogue-header > p:last-child {
   max-width: 700px;
 
   margin: 0;
 
-  color: #cfcfcf;
+  color: #c8c8c8;
 
-  line-height: 1.7;
+  font-size: 1rem;
+
+  line-height: 1.8;
 }
 
 
@@ -62,7 +83,7 @@
 .catalogue-filters {
   max-width: 1200px;
 
-  margin: 0 auto 3rem;
+  margin: 0 auto 4rem;
 
   padding: 1.5rem;
 
@@ -72,12 +93,21 @@
 
   gap: 1.5rem;
 
-  background: #2b2b2b;
+  background:
+    linear-gradient(
+      145deg,
+      #303030,
+      #252525
+    );
 
   border: 1px solid
-    rgba(212, 175, 55, 0.15);
+    rgba(212, 175, 55, 0.18);
 
-  border-radius: 12px;
+  border-radius: 14px;
+
+  box-shadow:
+    0 12px 35px
+    rgba(0, 0, 0, 0.25);
 }
 
 
@@ -88,29 +118,48 @@
 .search-box {
   flex: 1;
 
+  height: 52px;
+
+  padding: 0 1.1rem;
+
   display: flex;
 
   align-items: center;
 
-  gap: 0.75rem;
+  gap: 0.8rem;
 
-  height: 50px;
-
-  padding: 0 1rem;
-
-  background: #222;
+  background: #1f1f1f;
 
   border: 1px solid #444;
 
-  border-radius: 8px;
+  border-radius: 9px;
+
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
 }
 
-.search-box span {
-  font-size: 1.1rem;
+
+.search-box:focus-within {
+  border-color: #d4af37;
+
+  box-shadow:
+    0 0 0 3px
+    rgba(212, 175, 55, 0.08);
 }
+
+
+.search-box span {
+  font-size: 1rem;
+
+  opacity: 0.8;
+}
+
 
 .search-box input {
   width: 100%;
+
+  height: 100%;
 
   border: none;
 
@@ -118,18 +167,19 @@
 
   background: transparent;
 
-  color: white;
+  color: #ffffff;
 
   font-size: 0.95rem;
 }
 
+
 .search-box input::placeholder {
-  color: #888;
+  color: #777;
 }
 
 
 /* ============================================================
-   SELECT
+   FILTRE CIVILISATION
    ============================================================ */
 
 .filter-box {
@@ -139,37 +189,59 @@
 
   flex-direction: column;
 
-  gap: 0.4rem;
+  gap: 0.5rem;
 }
+
 
 .filter-box label {
-  color: #aaa;
+  color: #bdbdbd;
 
-  font-size: 0.8rem;
+  font-size: 0.75rem;
 
   font-weight: 600;
+
+  letter-spacing: 0.04em;
 }
 
+
 .filter-box select {
-  height: 50px;
+  width: 100%;
+
+  height: 52px;
 
   padding: 0 1rem;
 
-  background: #222;
+  background: #1f1f1f;
 
   border: 1px solid #444;
 
-  border-radius: 8px;
+  border-radius: 9px;
 
-  color: white;
+  color: #ffffff;
+
+  font-size: 0.9rem;
 
   outline: none;
 
   cursor: pointer;
+
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
 }
+
+
+.filter-box select:hover {
+  border-color: #666;
+}
+
 
 .filter-box select:focus {
   border-color: #d4af37;
+
+  box-shadow:
+    0 0 0 3px
+    rgba(212, 175, 55, 0.08);
 }
 
 
@@ -183,6 +255,9 @@
   margin: 0 auto;
 }
 
+
+/* En-tête des résultats */
+
 .catalogue-results-header {
   display: flex;
 
@@ -190,21 +265,40 @@
 
   justify-content: space-between;
 
-  margin-bottom: 1.5rem;
+  gap: 2rem;
+
+  margin-bottom: 2rem;
 }
+
+
+/* Label COLLECTION */
+
+.catalogue-results-header .catalogue-label {
+  margin-bottom: 0.7rem;
+}
+
+
+/* Titre collection */
 
 .catalogue-results-header h2 {
   margin: 0;
 
-  color: white;
+  color: #ffffff;
 
-  font-size: 1.8rem;
+  font-size: 1.9rem;
+
+  font-weight: 600;
 }
 
-.results-count {
-  color: #aaa;
 
-  font-size: 0.9rem;
+/* Nombre de résultats */
+
+.results-count {
+  padding-bottom: 0.2rem;
+
+  color: #999;
+
+  font-size: 0.85rem;
 }
 
 
@@ -218,7 +312,7 @@
   grid-template-columns:
     repeat(4, minmax(0, 1fr));
 
-  gap: 1.25rem;
+  gap: 1.5rem;
 }
 
 
@@ -227,14 +321,29 @@
    ============================================================ */
 
 .catalogue-card {
+  position: relative;
+
   overflow: hidden;
 
-  background: #2b2b2b;
+  display: flex;
+
+  flex-direction: column;
+
+  background:
+    linear-gradient(
+      145deg,
+      #303030,
+      #252525
+    );
 
   border: 1px solid
     rgba(212, 175, 55, 0.12);
 
-  border-radius: 12px;
+  border-radius: 14px;
+
+  box-shadow:
+    0 8px 25px
+    rgba(0, 0, 0, 0.2);
 
   transition:
     transform 0.3s ease,
@@ -242,14 +351,16 @@
     box-shadow 0.3s ease;
 }
 
-.catalogue-card:hover {
-  transform: translateY(-6px);
 
-  border-color: #d4af37;
+.catalogue-card:hover {
+  transform: translateY(-7px);
+
+  border-color:
+    rgba(212, 175, 55, 0.65);
 
   box-shadow:
-    0 12px 30px
-    rgba(0, 0, 0, 0.35);
+    0 18px 40px
+    rgba(0, 0, 0, 0.4);
 }
 
 
@@ -261,12 +372,28 @@
 .catalogue-placeholder {
   width: 100%;
 
-  height: 220px;
+  height: 270px;
 
   display: block;
 
   object-fit: cover;
 }
+
+
+/* Image */
+
+.catalogue-card img {
+  transition:
+    transform 0.5s ease;
+}
+
+
+.catalogue-card:hover img {
+  transform: scale(1.05);
+}
+
+
+/* Placeholder */
 
 .catalogue-placeholder {
   display: flex;
@@ -278,8 +405,8 @@
   background:
     linear-gradient(
       135deg,
-      #222,
-      #353535
+      #202020,
+      #383838
     );
 
   color: #d4af37;
@@ -289,41 +416,62 @@
 
 
 /* ============================================================
-   CONTENU
+   CONTENU CARTE
    ============================================================ */
 
 .catalogue-card-body {
-  padding: 1.25rem;
+  flex: 1;
+
+  padding: 1.4rem;
+
+  display: flex;
+
+  flex-direction: column;
 }
 
+
+/* Civilisation */
+
 .catalogue-card-category {
+  margin-bottom: 0.6rem;
+
   color: #d4af37;
 
-  font-size: 0.72rem;
+  font-size: 0.68rem;
 
   font-weight: 700;
 
-  text-transform: uppercase;
+  letter-spacing: 0.12em;
 
-  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
+
+
+/* Nom du dieu */
 
 .catalogue-card h3 {
-  margin: 0.5rem 0 0.75rem;
+  margin: 0 0 0.8rem;
 
-  color: white;
+  color: #ffffff;
 
-  font-size: 1.2rem;
+  font-size: 1.3rem;
+
+  font-weight: 600;
+
+  line-height: 1.3;
 }
+
+
+/* Description */
 
 .catalogue-card p {
   margin: 0;
 
-  color: #bbb;
+  color: #b7b7b7;
 
-  font-size: 0.9rem;
+  font-size: 0.88rem;
 
-  line-height: 1.6;
+  line-height: 1.65;
 
   display: -webkit-box;
 
@@ -336,31 +484,34 @@
 
 
 /* ============================================================
-   BOUTON
+   BOUTON DÉCOUVRIR
    ============================================================ */
 
 .catalogue-card-button {
-  margin-top: 1.2rem;
+  width: fit-content;
 
-  padding: 0;
+  margin-top: auto;
 
-  border: none;
-
-  background: none;
+  padding-top: 1.3rem;
 
   color: #d4af37;
 
-  font-size: 0.9rem;
+  font-size: 0.88rem;
 
   font-weight: 600;
 
-  cursor: pointer;
-  display: inline-block;
   text-decoration: none;
+
+  transition:
+    color 0.2s ease,
+    transform 0.2s ease;
 }
+
 
 .catalogue-card-button:hover {
   color: #f0d878;
+
+  transform: translateX(4px);
 }
 
 
@@ -369,38 +520,49 @@
    ============================================================ */
 
 .catalogue-message {
-  padding: 3rem;
+  padding: 4rem 2rem;
 
-  background: #2b2b2b;
+  background:
+    linear-gradient(
+      145deg,
+      #2d2d2d,
+      #242424
+    );
 
-  border-radius: 12px;
+  border: 1px solid
+    rgba(212, 175, 55, 0.12);
+
+  border-radius: 14px;
 
   color: #aaa;
 
   text-align: center;
+
+  box-shadow:
+    0 10px 30px
+    rgba(0, 0, 0, 0.2);
 }
 
 
 /* ============================================================
-   RESPONSIVE
+   TABLETTE
    ============================================================ */
 
-@media (max-width: 1050px) {
+@media (max-width: 1100px) {
+
   .catalogue-grid {
     grid-template-columns:
-      repeat(2, minmax(0, 1fr));
+      repeat(3, minmax(0, 1fr));
   }
+
 }
 
-@media (max-width: 700px) {
 
-  .catalogue-page {
-    padding: 2rem 1rem 4rem;
-  }
+/* ============================================================
+   PETITE TABLETTE
+   ============================================================ */
 
-  .catalogue-header h1 {
-    font-size: 2.2rem;
-  }
+@media (max-width: 850px) {
 
   .catalogue-filters {
     flex-direction: column;
@@ -408,19 +570,79 @@
     align-items: stretch;
   }
 
+
   .filter-box {
     width: 100%;
   }
 
+
   .catalogue-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
   }
+
+}
+
+
+/* ============================================================
+   MOBILE
+   ============================================================ */
+
+@media (max-width: 600px) {
+
+  .catalogue-page {
+    padding: 2.5rem 1rem 4rem;
+  }
+
+
+  .catalogue-header {
+    margin-bottom: 3rem;
+  }
+
+
+  .catalogue-header h1 {
+    font-size: 2.2rem;
+  }
+
+
+  .catalogue-header > p:last-child {
+    font-size: 0.9rem;
+
+    line-height: 1.7;
+  }
+
+
+  .catalogue-filters {
+    padding: 1rem;
+
+    margin-bottom: 3rem;
+  }
+
 
   .catalogue-results-header {
     align-items: flex-start;
 
     flex-direction: column;
 
-    gap: 0.5rem;
+    gap: 0.6rem;
   }
+
+
+  .catalogue-results-header h2 {
+    font-size: 1.6rem;
+  }
+
+
+  .catalogue-grid {
+    grid-template-columns: 1fr;
+
+    gap: 1.2rem;
+  }
+
+
+  .catalogue-card img,
+  .catalogue-placeholder {
+    height: 240px;
+  }
+
 }
